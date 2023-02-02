@@ -1,0 +1,36 @@
+# Spring Boot Build Artifacts
+target/
+
+# Log Files
+logs/
+
+# Gradle Build Output
+.gradle/
+build/
+
+# IDEA Project Files
+.idea/
+*.iml
+*.iws
+
+# Local Environment Files
+.env
+*.local
+
+# IntelliJ workspace.xml and .workspace files
+*.xml
+*.workspace
+
+# Maven Output
+target/
+
+# NetBeans Project Files
+nbproject/
+private/
+
+# Other Files
+*.log
+*.DS_Store
+
+# Sensitive Configuration Files
+application.properties
