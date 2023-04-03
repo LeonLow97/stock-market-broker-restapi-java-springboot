@@ -1,4 +1,4 @@
-package com.stockmarket.stockmarketapi;
+package com.stockmarket.stockmarketapi.entity;
 
 public class User {
     private String username;
