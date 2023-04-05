@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.stockmarket.stockmarketapi.entity.User;
+import com.stockmarket.stockmarketapi.response.WriteJSON;
 import com.stockmarket.stockmarketapi.service.UserService;
 
 
@@ -24,15 +25,16 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Object> SignUp(@RequestBody @Valid User user, BindingResult bindingResult) {
+    public ResponseEntity<WriteJSON> SignUp(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new WriteJSON("Bad Request", 400, errors), HttpStatus.BAD_REQUEST);
         }
         userService.addUser(user);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(new WriteJSON("Successfully added user!", 201), HttpStatus.CREATED);
     }
+    
 }

@@ -34,23 +34,28 @@ public class User {
     @NonNull
     @NotNull(message = "Username cannot be null. Please try again.")
     @NotBlank(message = "Username cannot be blank. Please try again.")
-    @Size(min = 8, max = 20, message = "Username must have 8 - 20 characters in length. Please try again.")
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$", message = "Username cannot contain special characters other than underscore '_'.")
+    @Size(min = 8, max = 20,
+            message = "Username must have 8 - 20 characters in length. Please try again.")
+    @Pattern(regexp = "^[a-zA-Z0-9_]*$",
+            message = "Username cannot contain special characters other than underscore '_'.")
     @Column(name = "username", nullable = false)
     private String username;
 
     @NonNull
     @NotNull(message = "Password cannot be null. Please try again.")
-    @NotBlank(message = "Username cannot be blank. Please try again.")
-    @Size(min = 12, max = 20, message = "Password must have 12 - 20 characters in length. Please try again.")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must contain at least one lowercase letter, one uppercase letter, one digit and one special character.")
+    @NotBlank(message = "Password cannot be blank. Please try again.")
+    @Size(min = 10, max = 20,
+            message = "Password must have 10 - 20 characters in length. Please try again.")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            message = "Password must contain at least one lowercase letter, one uppercase letter, one digit and one special character.")
     @Column(name = "password", nullable = false)
     private String password;
 
     @NonNull
     @NotNull(message = "Email cannot be null. Please try again.")
     @NotBlank(message = "Email cannot be blank. Please try again.")
-    @Size(max = 255, message = "Email address has a maximum length of 255 characters in length. Please try again.")
+    @Size(max = 255,
+            message = "Email address has a maximum length of 255 characters in length. Please try again.")
     @Email(message = "Invalid Email Address. Please try again.")
     @Column(name = "email", nullable = false)
     private String email;
@@ -73,7 +78,6 @@ public class User {
         setDateFormat(addedDate);
     }
 
-    @PrePersist
     private void setUpdatedDate() {
         setDateFormat(updatedDate);
     }
@@ -84,5 +88,5 @@ public class User {
         LocalDateTime parsedDate = LocalDateTime.parse(formattedDate, formatter);
         dateTime = parsedDate;
     }
-    
+
 }
