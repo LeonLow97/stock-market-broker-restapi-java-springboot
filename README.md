@@ -24,6 +24,8 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 
 ## Admin Role Endpoints
 
+| Method | Endpoint | Description                                      |
+| ------ | -------- | ------------------------------------------------ |
 | PUT | /users/{user_id} | Update an existing user account |
 | DELETE | /users/{user_id} | Delete an existing user account |
 | GET | /users/{user_id} | Retrieve information about a specific user account |
