@@ -2,10 +2,10 @@ package com.stockmarket.stockmarketapi.web;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,14 +25,9 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<WriteJSON> SignUp(@RequestBody @Valid User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-            return new ResponseEntity<>(new WriteJSON("Bad Request", 400, errors), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<WriteJSON> SignUp(@RequestBody User user) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.addUser(user);
         return new ResponseEntity<>(new WriteJSON("Successfully added user!", 201), HttpStatus.CREATED);
     }
