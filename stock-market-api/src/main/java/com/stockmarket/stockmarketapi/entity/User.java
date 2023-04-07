@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Entity
@@ -30,6 +32,7 @@ public class User {
     private String username;
 
     @NonNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -41,28 +44,13 @@ public class User {
     private int isActive;
 
     @Column(name = "added_date", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime addedDate = LocalDateTime.now();
 
     @Column(name = "updated_date", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedDate = LocalDateTime.now();
-
-    // @PrePersist ensures that this method is called before the entity is inserted into database
-    @PrePersist
-    private void setAddedDate() {
-        setDateFormat(addedDate);
-    }
-
-    // private void setUpdatedDate() {
-    //     setDateFormat(updatedDate);
-    // }
-
-    private void setDateFormat(LocalDateTime dateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDate = dateTime.format(formatter);
-        LocalDateTime parsedDate = LocalDateTime.parse(formattedDate, formatter);
-        dateTime = parsedDate;
-    }
 
 }

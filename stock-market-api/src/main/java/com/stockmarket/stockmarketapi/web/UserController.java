@@ -1,20 +1,20 @@
 package com.stockmarket.stockmarketapi.web;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.stockmarket.stockmarketapi.Constants;
 import com.stockmarket.stockmarketapi.entity.User;
-import com.stockmarket.stockmarketapi.response.WriteJSON;
 import com.stockmarket.stockmarketapi.service.UserService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 
 @RestController
@@ -25,11 +25,22 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<WriteJSON> SignUp(@RequestBody User user) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public ResponseEntity<User> SignUp(@RequestBody User user) {
         userService.addUser(user);
-        return new ResponseEntity<>(new WriteJSON("Successfully added user!", 201), HttpStatus.CREATED);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+
+    private Map<String, String> generateJWTToken(User user) {
+        long timestamp = System.currentTimeMillis();
+        String token = Jwts.builder().signWith(SignatureAlgorithm.HS256, Constants.API_SECRET_KEY)
+            .setIssuedAt(new Date(timestamp))
+            .setExpiration(new Date(timestamp + Constants.TOKEN_VALIDITY))
+            .claim("userId", user.getUserId())
+            .claim("email", user.getEmail())
+            .compact();
+        Map<String, String> map = new HashMap<>();
+        map.put("stock-market-token", token);
+        return map;
     }
     
 }
