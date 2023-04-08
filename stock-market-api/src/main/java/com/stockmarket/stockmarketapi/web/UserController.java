@@ -24,9 +24,15 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<User> SignUp(@RequestBody User user) {
-        userService.addUser(user);
+    @PostMapping("/login") 
+    public ResponseEntity<Map<String, String>> loginUser(@RequestBody User user) {
+        userService.validateUser(user);
+        return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<User> registerUser(@RequestBody User user) {
+        userService.registerUser(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
