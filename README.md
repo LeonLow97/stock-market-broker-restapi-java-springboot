@@ -36,8 +36,8 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 | ------ | ---------------------------------- | ----------------------------------------------------------------------- |
 | POST   | /api/deposit                       | Deposit money into the user's account.                                  |
 | POST   | /api/withdraw                      | Withdraw money from the user's account.                                 |
-| GET    | /api/stocks                        | Get a list of all stocks available.                                     |
-| GET    | /api/stocks/{symbol}               | Get details for a specific stock, identified by its ticker symbol       |
+| GET    | /api/stocks/popular                | Get the list of popular stocks on this stock broker platform.           |
+| GET    | /api/stocks/{stockTicker}          | Get details for a specific stock, identified by its ticker symbol       |
 | GET    | /api/orders                        | Get a list of all orders.                                               |
 | GET    | /api/orders/{orderId}              | Get details for a specific order.                                       |
 | POST   | /api/orders                        | Create a new order for a stock.                                         |
