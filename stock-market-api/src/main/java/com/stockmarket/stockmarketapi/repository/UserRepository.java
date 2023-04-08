@@ -1,8 +1,15 @@
 package com.stockmarket.stockmarketapi.repository;
 
+import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import com.stockmarket.stockmarketapi.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+
+  @Query(value = "SELECT COUNT(*) FROM accounts a WHERE a.email = ?1", nativeQuery = true)
+  Integer getCountByEmail(String email);
 
 }

@@ -1,6 +1,7 @@
 package com.stockmarket.stockmarketapi.service;
 
 import java.util.regex.Pattern;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import com.stockmarket.stockmarketapi.exception.BadRequestException;
 import com.stockmarket.stockmarketapi.repository.UserRepository;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
   @Autowired
@@ -42,6 +44,9 @@ public class UserServiceImpl implements UserService {
     if (!passwordPattern.matcher(user.getPassword()).matches())
       throw new BadRequestException(
           "Invalid password format. Password must contain at least one lowercase and uppercase character, number, and special character.");
+
+    Integer emailCount = userRepository.getCountByEmail(user.getEmail());
+    if (emailCount >= 1) throw new BadRequestException("Email already in use.");
 
     user.setIsActive(1);
 
