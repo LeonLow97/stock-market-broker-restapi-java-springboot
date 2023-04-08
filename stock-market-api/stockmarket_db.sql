@@ -6,15 +6,19 @@ CREATE DATABASE stockmarketdb WITH template=template0 OWNER=leonlow;
 ALTER DEFAULT privileges GRANT all ON tables TO leonlow;
 ALTER DEFAULT privileges GRANT all ON sequences TO leonlow;
 
-CREATE SEQUENCE accounts_seq INCREMENT 1 START 1;
+CREATE SEQUENCE accounts_seq START 1 INCREMENT 1;
 
 CREATE TABLE accounts (
   user_id INTEGER DEFAULT nextval('accounts_seq') PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
+  balance NUMERIC(15, 2) NOT NULL,
   is_active INT NOT NULL,
   added_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+SELECT setval('accounts_seq', (SELECT MAX(user_id) FROM accounts)+1);
+
 

@@ -37,6 +37,10 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @NonNull
+    @Column(name = "balance", nullable = false)
+    private Double balance;
+
     @Column(name = "is_active", nullable = false)
     private int isActive;
 

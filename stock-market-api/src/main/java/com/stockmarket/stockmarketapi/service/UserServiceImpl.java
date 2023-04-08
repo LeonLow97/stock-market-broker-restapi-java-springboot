@@ -1,5 +1,6 @@
 package com.stockmarket.stockmarketapi.service;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +36,20 @@ public class UserServiceImpl implements UserService {
       if (!passwordEncoder.matches(user.getPassword(), dbUser.getPassword())) {
         throw new AuthException("Incorrect email/password. Please try again.");
       }
+
+      // Check if account is disabled
+      if (dbUser.getIsActive() != 1) {
+        throw new AuthException("This account has been disabled.");
+      }
+
+      return dbUser;
     } catch (NullPointerException e) {
-      System.out.println("validateUser: " + e.getMessage());
       throw new AuthException("Incorrect email/password. Please try again.");
     }
-
-    return user;
-
   }
 
   @Override
-  public User registerUser(User user) {
+  public User registerUser(User user) throws BadRequestException {
     // Ensure email and password are filled
     if (user.getEmail() == null || user.getEmail().isBlank() || user.getPassword() == null
         || user.getPassword().isBlank() || user.getUsername() == null
@@ -75,11 +79,30 @@ public class UserServiceImpl implements UserService {
       throw new BadRequestException("Email already in use.");
 
     user.setIsActive(1);
+    user.setBalance(1000.0);
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
 
     return userRepository.save(user);
+  }
+
+  @Override
+  public void updateUserBalance(Integer userId, User user) throws BadRequestException {
+    Optional<User> dbUser = userRepository.findById(Long.valueOf(userId));
+    Double dbBalance = dbUser.map(u -> u.getBalance())
+        .orElseThrow(() -> new BadRequestException("User not found."));
+    Double updatedBalance = dbBalance + user.getBalance();
+
+    // Prevent user from withdrawing beyond $0
+    if (updatedBalance < 0.0) {
+      throw new BadRequestException("Balance is insufficient for the specified withdrawal amount.");
+    }
+
+    User updatedUser = dbUser.get();
+    updatedUser.setBalance(updatedBalance);
+
+    userRepository.save(updatedUser);
   }
 
   private Boolean emailFormatCheck(String email) {

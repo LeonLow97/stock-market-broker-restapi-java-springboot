@@ -7,6 +7,8 @@ import com.stockmarket.stockmarketapi.exception.BadRequestException;
 public interface UserService {
   
   User validateUser(User user) throws BadRequestException, AuthException;
-  User registerUser(User user) throws AuthException;
+  User registerUser(User user) throws BadRequestException;
+  
+  void updateUserBalance(Integer userId, User user) throws BadRequestException;
 
 }
