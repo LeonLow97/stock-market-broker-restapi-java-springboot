@@ -6,8 +6,6 @@ CREATE DATABASE stockmarketdb WITH template=template0 OWNER=leonlow;
 ALTER DEFAULT privileges GRANT all ON tables TO leonlow;
 ALTER DEFAULT privileges GRANT all ON sequences TO leonlow;
 
-CREATE SEQUENCE accounts_seq START 1 INCREMENT 1;
-
 CREATE TABLE accounts (
   user_id SERIAL PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
@@ -19,8 +17,6 @@ CREATE TABLE accounts (
   updated_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- SELECT setval('accounts_seq', (SELECT MAX(user_id) FROM accounts)+1);
-
 CREATE TABLE orders (
   order_id SERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL,
@@ -31,3 +27,15 @@ CREATE TABLE orders (
   order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES accounts (user_id)
 );
+
+CREATE TABLE portfolio (
+  portfolio_id SERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  stock_ticker VARCHAR(20),
+  no_of_shares INT NOT NULL,
+  price DECIMAL(15, 2) NOT NULL,
+  added_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES accounts(user_id)
+);
+
