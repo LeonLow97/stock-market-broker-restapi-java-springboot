@@ -12,6 +12,7 @@ import com.stockmarket.stockmarketapi.entity.Order;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
 import com.stockmarket.stockmarketapi.exception.OrderNotFilledException;
+import com.stockmarket.stockmarketapi.exception.ResourceNotFoundException;
 import com.stockmarket.stockmarketapi.repository.OrderRepository;
 import com.stockmarket.stockmarketapi.repository.UserRepository;
 import yahoofinance.Stock;
@@ -32,13 +33,25 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public List<Order> getAllOrders(int userId) {
-    return orderRepository.findAllByUserId(Long.valueOf(userId));
+  public List<Order> getAllOrders(int userId)  {
+    List<Order> orders = orderRepository.findAllByUserId(Long.valueOf(userId));
+    if (orders.isEmpty()) {
+      throw new ResourceNotFoundException("No orders were found.");
+    }
+    return orders;
+  }
+  
+  @Override
+  public Order getOrder(int userId, int orderId) {
+    Order order = orderRepository.findByUserIdAndOrderId(Long.valueOf(userId), Long.valueOf(orderId));
+    if (order == null) {
+      throw new ResourceNotFoundException("No order was found.");
+    }
+    return order;
   }
 
   @Override
-  public Order submitOrder(int userId, Order order)
-      throws BadRequestException, OrderNotFilledException {
+  public Order submitOrder(int userId, Order order) {
     // Trim Fields
     order.setOrderType(order.getOrderType().trim());
 
