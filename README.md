@@ -16,22 +16,22 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 
 ## Assumptions
 
-- Stock orders are placed *before the market opens* and will only be filled if the limit order price is within the low and high price after the market opens. Thus, the application is unable to fetch real-time per minute data as we are fetching the data from YahooFinanceAPI day highs and lows.
+- Stock orders are placed _before the market opens_ and will only be filled if the limit order price is within the low and high price after the market opens. Thus, the application is unable to fetch real-time per minute data as we are fetching the data from YahooFinanceAPI day highs and lows.
 - **Purchasing** a stock:
-  - If the purchase price of the stock is *greater* than the day high, the price of the stock will be purchased at the day high value.
-  - If the purchase price of the stock is *lower* than the day low, the purchase limit order will not be filled.
-  - If the purchase price of the stock is *within* the day high and day low, the price of the stock will be purchased at the specified price.
+  - If the purchase price of the stock is _greater_ than the day high, the price of the stock will be purchased at the day high value.
+  - If the purchase price of the stock is _lower_ than the day low, the purchase limit order will not be filled.
+  - If the purchase price of the stock is _within_ the day high and day low, the price of the stock will be purchased at the specified price.
 - **Selling** a stock:
-  - If the selling price of the stock is *greater* than the day high, the selling limit order will not be filled.
-  - If the selling price of the stock is *lower* than the day low, the price of the stock will be sold at the day low value.
-  - If the selling price of the stock is *within* the day high and day low, the price of the stock will be sold at the specified price.
+  - If the selling price of the stock is _greater_ than the day high, the selling limit order will not be filled.
+  - If the selling price of the stock is _lower_ than the day low, the price of the stock will be sold at the day low value.
+  - If the selling price of the stock is _within_ the day high and day low, the price of the stock will be sold at the specified price.
 
 ## Authentication Endpoints
 
 | Method | Endpoint      | Description                                      |
 | ------ | ------------- | ------------------------------------------------ |
-| POST   | /api/register | Create a new user account                        |
-| POST   | /api/login    | Authenticate a user and retrieve an access token |
+| _POST_ | /api/register | Create a new user account                        |
+| _POST_ | /api/login    | Authenticate a user and retrieve an access token |
 
 ## Admin Role Endpoints (Low Priority)
 
@@ -46,12 +46,12 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 
 | Method | Endpoint                           | Description                                                             |
 | ------ | ---------------------------------- | ----------------------------------------------------------------------- |
-| POST   | /api/deposit                       | Deposit money into the user's account.                                  |
-| POST   | /api/withdraw                      | Withdraw money from the user's account.                                 |
-| GET    | /api/stocks/{stockTicker}          | Get details for a specific stock, identified by its ticker symbol       |
+| _POST_ | /api/deposit                       | Deposit money into the user's account.                                  |
+| _POST_ | /api/withdraw                      | Withdraw money from the user's account.                                 |
+| _GET_  | /api/stocks/{stockTicker}          | Get details for a specific stock, identified by its ticker symbol       |
 | GET    | /api/orders                        | Get the entire order history of the user.                               |
 | GET    | /api/orders/{orderId}              | Get details for a specific order of the user.                           |
-| POST   | /api/orders                        | Create a new order for a stock.                                         |
+| _POST_ | /api/orders                        | Create a new order for a stock.                                         |
 | GET    | /portfolio/{userId}                | Retrieve information about the current user's portfolio of stocks       |
 | GET    | /api/portfolio/{userId}/history    | Get the historical portfolio for the user.                              |
 | GET    | /api/transactions/{userId}         | Retrieve a list of all transactions made by the current user            |

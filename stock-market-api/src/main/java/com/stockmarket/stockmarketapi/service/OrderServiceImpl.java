@@ -3,6 +3,7 @@ package com.stockmarket.stockmarketapi.service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,11 @@ public class OrderServiceImpl implements OrderService {
 
   enum ORDER_TYPE {
     BUY, SELL
+  }
+
+  @Override
+  public List<Order> getAllOrders(int userId) {
+    return orderRepository.findAllByUserId(Long.valueOf(userId));
   }
 
   @Override
@@ -73,8 +79,9 @@ public class OrderServiceImpl implements OrderService {
       Optional<User> dbUser = userRepository.findById(Long.valueOf(userId));
       Double dbBalance = dbUser.map(u -> u.getBalance())
           .orElseThrow(() -> new BadRequestException("User not found"));
-      
-      // Check if user has sufficient funds to purchase stocks and specified number of shares & price
+
+      // Check if user has sufficient funds to purchase stocks and specified number of shares &
+      // price
       Double cost = order.getPrice() * order.getNoOfShares();
       if (dbBalance < cost && type == ORDER_TYPE.BUY) {
         throw new OrderNotFilledException(
@@ -98,12 +105,14 @@ public class OrderServiceImpl implements OrderService {
           order.setPrice(stockQuote.getDayHigh().doubleValue());
           dbBalance = dbBalance - (order.getNoOfShares() * stockQuote.getDayHigh().doubleValue());
         } else if (type == ORDER_TYPE.SELL) {
-          throw new OrderNotFilledException("Order not filled as price is more than highest ask price on " + LocalDateTime.now());
+          throw new OrderNotFilledException(
+              "Order not filled as price is more than highest ask price on " + LocalDateTime.now());
         }
       }
 
       // Specified price is within the intra-day price
-      if (orderPrice.compareTo(stockQuote.getDayLow()) >= 0 || orderPrice.compareTo(stockQuote.getDayHigh()) <= 0) {
+      if (orderPrice.compareTo(stockQuote.getDayLow()) >= 0
+          || orderPrice.compareTo(stockQuote.getDayHigh()) <= 0) {
         if (type == ORDER_TYPE.BUY) {
           dbBalance = dbBalance - cost;
         } else if (type == ORDER_TYPE.SELL) {

@@ -1,9 +1,11 @@
 package com.stockmarket.stockmarketapi.web;
 
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,12 @@ public class OrderController {
 
   @Autowired
   OrderService orderService;
+
+  @GetMapping("/orders")
+  public ResponseEntity<List<Order>> getAllOrders(HttpServletRequest request) {
+    int userId = (Integer) request.getAttribute("userId");
+    return new ResponseEntity<>(orderService.getAllOrders(userId), HttpStatus.OK);
+  }
 
   @PostMapping("/orders")
   public ResponseEntity<Order> submitOrder(HttpServletRequest request, @RequestBody Order order) {
