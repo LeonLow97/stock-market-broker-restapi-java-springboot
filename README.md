@@ -14,6 +14,10 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 - Error Handling
 - 3-Tier Architecture: Repository, Service and Web.
 
+## Assumptions
+
+- Stock orders are placed *before the market opens* and will only be filled if the limit order price is within the low and high price after the market opens.
+
 ## Authentication Endpoints
 
 | Method | Endpoint      | Description                                      |
@@ -36,13 +40,10 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 | ------ | ---------------------------------- | ----------------------------------------------------------------------- |
 | POST   | /api/deposit                       | Deposit money into the user's account.                                  |
 | POST   | /api/withdraw                      | Withdraw money from the user's account.                                 |
-| GET    | /api/stocks/popular                | Get the list of popular stocks on this stock broker platform.           |
 | GET    | /api/stocks/{stockTicker}          | Get details for a specific stock, identified by its ticker symbol       |
-| GET    | /api/orders                        | Get a list of all orders.                                               |
-| GET    | /api/orders/{orderId}              | Get details for a specific order.                                       |
+| GET    | /api/orders                        | Get the entire order history of the user.                               |
+| GET    | /api/orders/{orderId}              | Get details for a specific order of the user.                           |
 | POST   | /api/orders                        | Create a new order for a stock.                                         |
-| PUT    | /api/orders/{orderId}              | Update an existing order                                                |
-| DELETE | /api/orders/{orderId}              | Cancel an existing order                                                |
 | GET    | /portfolio/{userId}                | Retrieve information about the current user's portfolio of stocks       |
 | GET    | /api/portfolio/{userId}/history    | Get the historical portfolio for the user.                              |
 | GET    | /api/transactions/{userId}         | Retrieve a list of all transactions made by the current user            |
@@ -51,3 +52,11 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 | POST   | /api/watchlist/{user_id}           | Add a stock to the current user's watchlist                             |
 | DELETE | /api/watchlist/{symbol}            | Remove a stock from the current user's watchlist                        |
 | GET    | /api/market-data                   | Retrieve market data, such as stock prices, indices and trading volumes |
+
+## To Do
+
+- For Deposit and Withdrawal, ensure that amount cannot be negative.
+- Trim White Spaces
+- Data Validation for all the fields
+  - Accept INT, STRING, DOUBLE
+  - Field length

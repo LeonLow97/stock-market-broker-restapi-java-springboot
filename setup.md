@@ -18,7 +18,7 @@
   - `psql -U postgres --file stockmarket_db.sql`
   - Type `exit` to exit the docker container CLI
 
-4. Running Docker Container on Interactive mode to access PostgreSQL (use this for future access to database)
+4. Running Docker Container on Interactive mode to access PostgreSQL (**use this for future access to database**)
   - `docker container exec -it stockmarketdb psql -U postgres`
   - In the interactive CLI docker container, run `\connect stockmarketdb`, enter `\q` to quit.
 
