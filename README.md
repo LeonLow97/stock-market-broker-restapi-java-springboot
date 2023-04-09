@@ -49,17 +49,14 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 | _POST_ | /api/deposit                       | Deposit money into the user's account.                                  |
 | _POST_ | /api/withdraw                      | Withdraw money from the user's account.                                 |
 | _GET_  | /api/stocks/{stockTicker}          | Get details for a specific stock, identified by its ticker symbol       |
-| GET    | /api/orders                        | Get the entire order history of the user.                               |
-| GET    | /api/orders/{orderId}              | Get details for a specific order of the user.                           |
+| _GET_  | /api/orders                        | Get the entire order history of the user.                               |
+| _GET_  | /api/orders/{orderId}              | Get details for a specific order of the user.                           |
 | _POST_ | /api/orders                        | Create a new order for a stock.                                         |
-| GET    | /portfolio/{userId}                | Retrieve information about the current user's portfolio of stocks       |
+| GET    | /api/portfolio/{userId}            | Retrieve information about the current user's portfolio of stocks       |
 | GET    | /api/portfolio/{userId}/history    | Get the historical portfolio for the user.                              |
-| GET    | /api/transactions/{userId}         | Retrieve a list of all transactions made by the current user            |
-| GET    | /api/transactions/{transaction_id} | Retrieve information about a specific transaction, identified by its ID |
 | GET    | /api/watchlist/{user_id}           | Retrieve a list of all stocks in the current user's watchlist           |
 | POST   | /api/watchlist/{user_id}           | Add a stock to the current user's watchlist                             |
 | DELETE | /api/watchlist/{symbol}            | Remove a stock from the current user's watchlist                        |
-| GET    | /api/market-data                   | Retrieve market data, such as stock prices, indices and trading volumes |
 
 ## To Do
 
