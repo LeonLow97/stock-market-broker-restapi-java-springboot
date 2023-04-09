@@ -14,6 +14,13 @@ public class StockData {
   
   private String stockName;
   private String stockTicker;
+  private BigDecimal previousDayClose;
   private BigDecimal stockPrice;
+  private BigDecimal dayHigh;
+  private BigDecimal dayLow;
+  private BigDecimal dayChangeInPercent;
+  private BigDecimal _52WeekChangeInPercent;
+  private BigDecimal _52WeekHighHigh;
+  private BigDecimal yearDividendInPercent;
 
 }

@@ -1,39 +1,48 @@
 package com.stockmarket.stockmarketapi.service;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import com.stockmarket.stockmarketapi.exception.BadRequestException;
+import com.stockmarket.stockmarketapi.stockmodel.StockData;
 import com.stockmarket.stockmarketapi.stockmodel.StockWrapper;
 import lombok.AllArgsConstructor;
+import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 
 @AllArgsConstructor
 @Service
 public class StockService {
 
-  public StockWrapper findStock(final String ticker) {
+  public StockData findStock(final String ticker) throws IOException {
     try {
-      return new StockWrapper(YahooFinance.get(ticker));
+      Stock stock = YahooFinance.get(ticker);
+      StockWrapper stockWrapper = new StockWrapper(stock);
+
+      if (stock == null) {
+        throw new BadRequestException("Stock ticker does not exist.");
+      }
+
+      StockData stockData = new StockData();
+      stockData.setStockName(stock.getName());
+      stockData.setStockTicker(stockWrapper.getStock().getQuote().getSymbol());
+      stockData.setPreviousDayClose(stockWrapper.getStock().getQuote().getPreviousClose());
+      stockData.setStockPrice(stockWrapper.getStock().getQuote(true).getPrice());
+      stockData.setDayHigh(stockWrapper.getStock().getQuote().getDayHigh());
+      stockData.setDayLow(stockWrapper.getStock().getQuote().getDayLow());
+      stockData.setDayChangeInPercent(stockWrapper.getStock().getQuote().getChangeInPercent());
+      stockData.set_52WeekChangeInPercent(stockWrapper.getStock().getQuote().getChangeFromYearHighInPercent());
+      stockData.set_52WeekHighHigh(stockWrapper.getStock().getQuote().getYearHigh());
+      stockData.setYearDividendInPercent(stockWrapper.getStock().getDividend().getAnnualYieldPercent());
+
+      return stockData;
+      // return new StockWrapper(YahooFinance.get(ticker));
     } catch (IOException e) {
-      System.out.println("Error in finding stock: " + e.getMessage());
+      throw new IOException("Failed to connect to Yahoo Finance API");
     }
-    return null;
   }
 
-  public BigDecimal findPrice(final StockWrapper stock) throws IOException {
-    try {
-      return stock.getStock().getQuote(true).getPrice();
-    } catch (IOException e) {
-      System.out.println(e.getMessage());
-      throw new IOException("IOException.");
-    }
-  }
-
-  public List<StockWrapper> findStocks(final List<String> tickers) {
-    return tickers.stream().map(this::findStock).filter(Objects::nonNull).collect(Collectors.toList());
-  }
+  // public List<StockWrapper> findStocks(final List<String> tickers) {
+  //   return tickers.stream().map(this::findStock).filter(Objects::nonNull).collect(Collectors.toList());
+  // }
 
 }
