@@ -23,7 +23,7 @@ CREATE TABLE orders (
   stock_ticker VARCHAR(20) NOT NULL,
   order_type VARCHAR(10) NOT NULL,
   no_of_shares INT NOT NULL,
-  price DECIMAL(15,2) NOT NULL,
+  cost DECIMAL(15,2) NOT NULL,
   order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES accounts (user_id)
 );
@@ -31,9 +31,13 @@ CREATE TABLE orders (
 CREATE TABLE portfolio (
   portfolio_id SERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL,
-  stock_ticker VARCHAR(20),
+  stock_name VARCHAR(255) NOT NULL,
+  stock_ticker VARCHAR(20) NOT NULL,
   no_of_shares INT NOT NULL,
-  price DECIMAL(15, 2) NOT NULL,
+  cost DECIMAL(15, 2) NOT NULL,
+  price DECIMAL(15,2) NOT NULL,
+  pnl_in_percentage DECIMAL(3, 2) NOT NULL,
+  pnl_in_dollars DECIMAL(15, 2) NOT NULL,
   added_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES accounts(user_id)

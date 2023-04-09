@@ -33,6 +33,7 @@ public class Portfolio {
   private Long userId;
 
   @NonNull
+  @Column(name = "stock_name", nullable = false)
   private String stockName;
 
   @NonNull
@@ -43,13 +44,19 @@ public class Portfolio {
   private int noOfShares;
 
   @NonNull
+  @Column(name = "cost", nullable = false)
+  private Double cost;
+
+  @NonNull
   @Column(name = "price", nullable = false)
   private Double price;
 
   @NonNull
+  @Column(name = "pnl_in_percentage", nullable = false)
   private Double PNLInPercentage;
 
   @NonNull
+  @Column(name = "pnl_in_dollars", nullable = false)
   private Double PNLInDollars;
 
   @NonNull

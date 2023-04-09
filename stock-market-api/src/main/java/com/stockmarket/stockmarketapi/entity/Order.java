@@ -45,8 +45,8 @@ public class Order {
   private int noOfShares;
 
   @NonNull
-  @Column(name = "price", nullable = false)
-  private Double price;
+  @Column(name = "cost", nullable = false)
+  private Double cost;
 
   @Column(name = "order_date", nullable = false)
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
