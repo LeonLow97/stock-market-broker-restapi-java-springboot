@@ -15,7 +15,7 @@ public class StockService {
 
   public StockData findStock(final String ticker) throws IOException {
     try {
-      Stock stock = YahooFinance.get(ticker);
+      Stock stock = YahooFinance.get(ticker.trim());
       StockWrapper stockWrapper = new StockWrapper(stock);
 
       if (stock == null) {

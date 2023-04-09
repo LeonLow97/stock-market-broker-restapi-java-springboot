@@ -16,7 +16,15 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 
 ## Assumptions
 
-- Stock orders are placed *before the market opens* and will only be filled if the limit order price is within the low and high price after the market opens.
+- Stock orders are placed *before the market opens* and will only be filled if the limit order price is within the low and high price after the market opens. Thus, the application is unable to fetch real-time per minute data as we are fetching the data from YahooFinanceAPI day highs and lows.
+- **Purchasing** a stock:
+  - If the purchase price of the stock is *greater* than the day high, the price of the stock will be purchased at the day high value.
+  - If the purchase price of the stock is *lower* than the day low, the purchase limit order will not be filled.
+  - If the purchase price of the stock is *within* the day high and day low, the price of the stock will be purchased at the specified price.
+- **Selling** a stock:
+  - If the selling price of the stock is *greater* than the day high, the selling limit order will not be filled.
+  - If the selling price of the stock is *lower* than the day low, the price of the stock will be sold at the day low value.
+  - If the selling price of the stock is *within* the day high and day low, the price of the stock will be sold at the specified price.
 
 ## Authentication Endpoints
 
