@@ -32,6 +32,7 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 | ------ | ------------- | ------------------------------------------------ |
 | _POST_ | /api/register | Create a new user account                        |
 | _POST_ | /api/login    | Authenticate a user and retrieve an access token |
+| _GET_  | /api/user     | Get User Details by User Id.                     |
 
 ## Admin Role Endpoints (Low Priority)
 
@@ -44,19 +45,18 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 
 ## Stock Market Endpoints
 
-| Method | Endpoint                           | Description                                                             |
-| ------ | ---------------------------------- | ----------------------------------------------------------------------- |
-| _POST_ | /api/deposit                       | Deposit money into the user's account.                                  |
-| _POST_ | /api/withdraw                      | Withdraw money from the user's account.                                 |
-| _GET_  | /api/stocks/{stockTicker}          | Get details for a specific stock, identified by its ticker symbol       |
-| _GET_  | /api/orders                        | Get the entire order history of the user.                               |
-| _GET_  | /api/orders/{orderId}              | Get details for a specific order of the user.                           |
-| _POST_ | /api/orders                        | Create a new order for a stock.                                         |
-| GET    | /api/portfolio/{userId}            | Retrieve information about the current user's portfolio of stocks       |
-| GET    | /api/portfolio/{userId}/history    | Get the historical portfolio for the user.                              |
-| GET    | /api/watchlist/{user_id}           | Retrieve a list of all stocks in the current user's watchlist           |
-| POST   | /api/watchlist/{user_id}           | Add a stock to the current user's watchlist                             |
-| DELETE | /api/watchlist/{symbol}            | Remove a stock from the current user's watchlist                        |
+| Method | Endpoint                  | Description                                                        |
+| ------ | ------------------------- | ------------------------------------------------------------------ |
+| _POST_ | /api/deposit              | Deposit money into the user's account.                             |
+| _POST_ | /api/withdraw             | Withdraw money from the user's account.                            |
+| _GET_  | /api/stocks/{stockTicker} | Get details for a specific stock, identified by its ticker symbol  |
+| _GET_  | /api/orders               | Get the entire order history of the user.                          |
+| _GET_  | /api/orders/{orderId}     | Get details for a specific order of the user.                      |
+| _POST_ | /api/orders               | Create a new order for a stock.                                    |
+| GET    | /api/portfolio/{userId}   | Retrieve information about the current user's portfolio of stocks. |
+| GET    | /api/watchlist/{user_id}  | Retrieve a list of all stocks in the current user's watchlist.     |
+| POST   | /api/watchlist/{user_id}  | Add a stock to the current user's watchlist.                       |
+| DELETE | /api/watchlist/{symbol}   | Remove a stock from the current user's watchlist.                  |
 
 ## To Do
 
