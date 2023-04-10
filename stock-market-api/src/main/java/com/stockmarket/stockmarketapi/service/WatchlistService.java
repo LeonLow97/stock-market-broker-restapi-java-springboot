@@ -8,6 +8,7 @@ import com.stockmarket.stockmarketapi.exception.ResourceNotFoundException;
 public interface WatchlistService {
 
   List<Watchlist> getWatchlist(int userId) throws ResourceNotFoundException;
-  Watchlist addWatchlist(int userId, String stockTicker) throws ResourceAlreadyExistsException, ResourceNotFoundException;
+  Watchlist addStockWatchlist(int userId, String stockTicker) throws ResourceAlreadyExistsException, ResourceNotFoundException;
+  void removeStockWatchlist(int userId, String stockTicker);
   
 }

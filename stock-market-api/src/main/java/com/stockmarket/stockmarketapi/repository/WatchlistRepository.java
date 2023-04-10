@@ -8,5 +8,6 @@ public interface WatchlistRepository extends JpaRepository<Watchlist, Long> {
   
     List<Watchlist> findAllByUserId(Long userId);
     Watchlist findByUserIdAndStockTicker(Long userId, String stockTicker);
+    void removeByUserIdAndStockTicker(Long userId, String stockTicker);
 
 }

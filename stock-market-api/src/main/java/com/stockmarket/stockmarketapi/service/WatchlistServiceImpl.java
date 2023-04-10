@@ -28,7 +28,7 @@ public class WatchlistServiceImpl implements WatchlistService {
     return watchlist;
   }
 
-  public Watchlist addWatchlist(int userId, String stockTicker)
+  public Watchlist addStockWatchlist(int userId, String stockTicker)
       throws ResourceAlreadyExistsException, ResourceNotFoundException {
     try {
       Stock stock = YahooFinance.get(stockTicker.trim());
@@ -36,7 +36,8 @@ public class WatchlistServiceImpl implements WatchlistService {
         throw new ResourceNotFoundException("Stock Ticker does not exist.");
       }
 
-      Watchlist dbWatchlist = watchlistRepository.findByUserIdAndStockTicker(Long.valueOf(userId), stockTicker);
+      Watchlist dbWatchlist =
+          watchlistRepository.findByUserIdAndStockTicker(Long.valueOf(userId), stockTicker);
       if (dbWatchlist != null) {
         throw new ResourceAlreadyExistsException("Stock already in watchlist.");
       }
@@ -49,7 +50,8 @@ public class WatchlistServiceImpl implements WatchlistService {
       watchlist.setPreviousDayClose(stock.getQuote().getPreviousClose().doubleValue());
       watchlist.set_52WeekHigh(stock.getQuote().getYearHigh().doubleValue());
       watchlist.set_52WeekLow(stock.getQuote().getYearLow().doubleValue());
-      watchlist.setMarketCapInBillions(stock.getStats().getMarketCap().doubleValue() / 1_000_000_000.0);
+      watchlist
+          .setMarketCapInBillions(stock.getStats().getMarketCap().doubleValue() / 1_000_000_000.0);
       watchlist.setAnnualDividendYield(stock.getDividend().getAnnualYieldPercent().doubleValue());
 
       Watchlist addedWatchlist = watchlistRepository.save(watchlist);
@@ -58,6 +60,11 @@ public class WatchlistServiceImpl implements WatchlistService {
       System.out.println("IOException YahooFinanceAPI addWatchlist: " + e.getMessage());
     }
     return null;
+  }
+
+  @Override
+  public void removeStockWatchlist(int userId, String stockTicker) {
+    watchlistRepository.removeByUserIdAndStockTicker(Long.valueOf(userId), stockTicker);
   }
 
 }
