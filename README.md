@@ -45,19 +45,23 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 
 ## Stock Market Endpoints
 
-| Method | Endpoint                     | Description                                                        |
-| ------ | ---------------------------- | ------------------------------------------------------------------ |
-| _POST_ | /api/deposit                 | Deposit money into the user's account.                             |
-| _POST_ | /api/withdraw                | Withdraw money from the user's account.                            |
-| _GET_  | /api/stocks/{stockTicker}    | Get details for a specific stock, identified by its ticker symbol  |
-| _GET_  | /api/orders                  | Get the entire order history of the user.                          |
-| _GET_  | /api/orders/{orderId}        | Get details for a specific order of the user.                      |
-| _POST_ | /api/orders                  | Create a new order for a stock.                                    |
-| _GET_  | /api/portfolio/              | Retrieve information about the current user's portfolio of stocks. |
-| _GET_  | /api/portfolio/{portfolioId} | Retrieve information about a specified stock in the portfolio.     |
-| GET    | /api/watchlist/{stockTicker}      | Retrieve a list of all stocks in the current user's watchlist.     |
-| POST   | /api/watchlist/{stockTicker}      | Add a stock to the current user's watchlist.                       |
-| DELETE | /api/watchlist/{stockTicker}      | Remove a stock from the current user's watchlist.                  |
+| Method   | Endpoint                     | Description                                                        |
+| -------- | ---------------------------- | ------------------------------------------------------------------ |
+| _POST_   | /api/deposit                 | Deposit money into the user's account.                             |
+| _POST_   | /api/withdraw                | Withdraw money from the user's account.                            |
+| _GET_    | /api/stocks/{stockTicker}    | Get details for a specific stock, identified by its ticker symbol  |
+| _GET_    | /api/orders                  | Get the entire order history of the user.                          |
+| _GET_    | /api/orders/{orderId}        | Get details for a specific order of the user.                      |
+| _POST_   | /api/orders                  | Create a new order for a stock.                                    |
+| _GET_    | /api/portfolio/              | Retrieve information about the current user's portfolio of stocks. |
+| _GET_    | /api/portfolio/{portfolioId} | Retrieve information about a specified stock in the portfolio.     |
+| _GET_    | /api/watchlist/{stockTicker} | Retrieve a list of all stocks in the current user's watchlist.     |
+| _POST_   | /api/watchlist/{stockTicker} | Add a stock to the current user's watchlist.                       |
+| _DELETE_ | /api/watchlist/{stockTicker} | Remove a stock from the current user's watchlist.                  |
+
+## Swagger UI Documentation
+
+- [Swagger UI](http://localhost:8080/swagger-ui/index.html)
 
 ## To Do
 

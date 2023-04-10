@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
   UserRepository userRepository;
 
   @Override
-  public User validateUser(User user) throws BadRequestException, AuthException {
+  public User validateUser(User user) {
     try {
       if (user.getEmail() == null || user.getEmail().isBlank() || user.getPassword() == null
           || user.getPassword().isBlank()) {
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User registerUser(User user) throws BadRequestException {
+  public User registerUser(User user) {
     // Ensure email and password are filled
     if (user.getEmail() == null || user.getEmail().isBlank() || user.getPassword() == null
         || user.getPassword().isBlank() || user.getUsername() == null
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void updateUserBalance(Integer userId, User user) throws BadRequestException {
+  public void updateUserBalance(Integer userId, User user) {
     Optional<User> dbUser = userRepository.findById(Long.valueOf(userId));
     Double dbBalance = dbUser.map(u -> u.getBalance())
         .orElseThrow(() -> new BadRequestException("User not found."));

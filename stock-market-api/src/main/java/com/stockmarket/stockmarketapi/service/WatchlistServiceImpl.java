@@ -20,7 +20,7 @@ public class WatchlistServiceImpl implements WatchlistService {
   WatchlistRepository watchlistRepository;
 
   @Override
-  public List<Watchlist> getWatchlist(int userId) throws ResourceNotFoundException {
+  public List<Watchlist> getWatchlist(int userId) {
     List<Watchlist> watchlist = watchlistRepository.findAllByUserId(Long.valueOf(userId));
     if (watchlist == null) {
       throw new ResourceNotFoundException("Watchlist is empty");
@@ -28,8 +28,7 @@ public class WatchlistServiceImpl implements WatchlistService {
     return watchlist;
   }
 
-  public Watchlist addStockWatchlist(int userId, String stockTicker)
-      throws ResourceAlreadyExistsException, ResourceNotFoundException {
+  public Watchlist addStockWatchlist(int userId, String stockTicker) {
     try {
       Stock stock = YahooFinance.get(stockTicker.trim());
       if (stock == null) {

@@ -16,14 +16,23 @@ import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "User Controller",
+        description = "To sign up for an account and log in with the provided login credentials. Provides endpoint for withdrawing and depositing cash into the created account.")
 public class UserController {
 
     @Autowired
     UserService userService;
 
+    @Operation(summary = "Login account.",
+            description = "Provides a JWT Token for authenticated users.")
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody User user) {
         user = userService.validateUser(user);
@@ -36,8 +45,16 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Sign up an account.", description = "Create a new account for new users.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Successful creation of a new account.",
+                    content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "400",
+                    description = "Empty fields provided or the provided sign up details did not fulfil the requirements")})
     @PutMapping("/api/deposit")
-    public ResponseEntity<Map<String, Boolean>> updateUserBalance(HttpServletRequest request, @RequestBody User user) {
+    public ResponseEntity<Map<String, Boolean>> updateUserBalance(HttpServletRequest request,
+            @RequestBody User user) {
         int userId = (Integer) request.getAttribute("userId");
         userService.updateUserBalance(userId, user);
         Map<String, Boolean> map = new HashMap<>();
@@ -46,7 +63,8 @@ public class UserController {
     }
 
     @PutMapping("/api/withdraw")
-    public ResponseEntity<Map<String, Boolean>> withdrawUserBalance(HttpServletRequest request, @RequestBody User user) {
+    public ResponseEntity<Map<String, Boolean>> withdrawUserBalance(HttpServletRequest request,
+            @RequestBody User user) {
         int userId = (Integer) request.getAttribute("userId");
         user.setBalance(-1.0 * user.getBalance());
         userService.updateUserBalance(userId, user);
