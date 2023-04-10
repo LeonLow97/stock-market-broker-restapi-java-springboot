@@ -43,3 +43,18 @@ CREATE TABLE portfolio (
   FOREIGN KEY (user_id) REFERENCES accounts(user_id)
 );
 
+CREATE TABLE watchlist (
+  watchlist_id SERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  stock_name VARCHAR(255) NOT NULL,
+  stock_ticker VARCHAR(20) NOT NULL,
+  price DECIMAL(15, 2) NOT NULL,
+  previous_day_close DECIMAL(15, 2) NOT NULL,
+  _52_week_high DECIMAL(15, 2) NOT NULL,
+  _52_week_low DECIMAL(15, 2) NOT NULL,
+  market_cap_in_billions DECIMAL(15, 2) NOT NULL,
+  annual_dividend_yield DECIMAL(4, 2) NOT NULL,
+  updated_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES accounts(user_id)
+);
+

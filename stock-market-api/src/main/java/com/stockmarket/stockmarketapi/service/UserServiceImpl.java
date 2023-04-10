@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.exception.AuthException;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
+import com.stockmarket.stockmarketapi.exception.ResourceAlreadyExistsException;
 import com.stockmarket.stockmarketapi.repository.UserRepository;
 
 @Service
@@ -76,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     Integer emailCount = userRepository.getCountByEmail(user.getEmail());
     if (emailCount >= 1)
-      throw new BadRequestException("Email already in use.");
+      throw new ResourceAlreadyExistsException("Email already in use.");
 
     user.setIsActive(1);
     user.setBalance(1000.0);

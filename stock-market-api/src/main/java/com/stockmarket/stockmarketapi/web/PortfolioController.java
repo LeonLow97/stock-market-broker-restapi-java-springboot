@@ -2,7 +2,6 @@ package com.stockmarket.stockmarketapi.web;
 
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
