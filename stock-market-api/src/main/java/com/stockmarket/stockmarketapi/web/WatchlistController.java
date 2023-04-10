@@ -1,9 +1,11 @@
 package com.stockmarket.stockmarketapi.web;
 
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,13 @@ public class WatchlistController {
 
   @Autowired
   WatchlistService watchlistService;
+
+  @GetMapping("/watchlist")
+  public ResponseEntity<List<Watchlist>> getWatchlist(HttpServletRequest request) {
+    int userId = (Integer) request.getAttribute("userId");
+    List<Watchlist> watchlist = watchlistService.getWatchlist(userId);
+    return new ResponseEntity<>(watchlist, HttpStatus.OK);
+  }
 
   @PostMapping("/watchlist/{stockTicker}")
   public ResponseEntity<Watchlist> addWatchlist(HttpServletRequest request,

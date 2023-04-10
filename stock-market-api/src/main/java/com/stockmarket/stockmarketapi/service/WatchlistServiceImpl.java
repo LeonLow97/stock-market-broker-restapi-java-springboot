@@ -1,11 +1,11 @@
 package com.stockmarket.stockmarketapi.service;
 
 import java.io.IOException;
+import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.stockmarket.stockmarketapi.entity.Watchlist;
-import com.stockmarket.stockmarketapi.exception.BadRequestException;
 import com.stockmarket.stockmarketapi.exception.ResourceAlreadyExistsException;
 import com.stockmarket.stockmarketapi.exception.ResourceNotFoundException;
 import com.stockmarket.stockmarketapi.repository.WatchlistRepository;
@@ -19,8 +19,17 @@ public class WatchlistServiceImpl implements WatchlistService {
   @Autowired
   WatchlistRepository watchlistRepository;
 
+  @Override
+  public List<Watchlist> getWatchlist(int userId) throws ResourceNotFoundException {
+    List<Watchlist> watchlist = watchlistRepository.findAllByUserId(Long.valueOf(userId));
+    if (watchlist == null) {
+      throw new ResourceNotFoundException("Watchlist is empty");
+    }
+    return watchlist;
+  }
+
   public Watchlist addWatchlist(int userId, String stockTicker)
-      throws BadRequestException, ResourceNotFoundException {
+      throws ResourceAlreadyExistsException, ResourceNotFoundException {
     try {
       Stock stock = YahooFinance.get(stockTicker.trim());
       if (stock == null) {
