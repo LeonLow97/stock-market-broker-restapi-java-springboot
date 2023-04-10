@@ -33,25 +33,38 @@ public class UserController {
 
     @Operation(summary = "Login account.",
             description = "Provides a JWT Token for authenticated users.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Successful Login."),
+            @ApiResponse(responseCode = "401", description = "Invalid login credentials."),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad Request. Did not fill in all fields.")})
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody User user) {
         user = userService.validateUser(user);
         return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
     }
 
+    @Operation(summary = "Sign up an account.", description = "Create a new account for new users.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Successful creation of a new account.",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "400",
+                    description = "Empty fields provided or the provided sign up details did not fulfil the requirements"),
+            @ApiResponse(responseCode = "409",
+                    description = "Email address already exists and the provided email must be unique.")})
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         userService.registerUser(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
-
-    @Operation(summary = "Sign up an account.", description = "Create a new account for new users.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
-                    description = "Successful creation of a new account.",
-                    content = @Content(schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "400",
-                    description = "Empty fields provided or the provided sign up details did not fulfil the requirements")})
+    
+    @Operation(summary = "Deposit money to account.",
+            description = "Update user balance after depositing the sum of money.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200",
+            description = "Successfully deposited the specified amount into the user's account.",
+            content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404", description = "User account does not exist.", content = @Content)})
     @PutMapping("/api/deposit")
     public ResponseEntity<Map<String, Boolean>> updateUserBalance(HttpServletRequest request,
             @RequestBody User user) {
@@ -62,6 +75,12 @@ public class UserController {
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
+    @Operation(summary = "Withdraw money from account",
+            description = "Update user balance after withdrawing the sum of money.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200",
+            description = "Successfully withdrew the specified amount from the user's account."),
+            @ApiResponse(responseCode = "404", description = "User account does not exist."),
+            @ApiResponse(responseCode = "400", description = "Insufficient balance.")})
     @PutMapping("/api/withdraw")
     public ResponseEntity<Map<String, Boolean>> withdrawUserBalance(HttpServletRequest request,
             @RequestBody User user) {

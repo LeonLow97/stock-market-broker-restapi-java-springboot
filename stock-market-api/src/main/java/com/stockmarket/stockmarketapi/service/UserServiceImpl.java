@@ -10,6 +10,7 @@ import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.exception.AuthException;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
 import com.stockmarket.stockmarketapi.exception.ResourceAlreadyExistsException;
+import com.stockmarket.stockmarketapi.exception.ResourceNotFoundException;
 import com.stockmarket.stockmarketapi.repository.UserRepository;
 
 @Service
@@ -92,7 +93,7 @@ public class UserServiceImpl implements UserService {
   public void updateUserBalance(Integer userId, User user) {
     Optional<User> dbUser = userRepository.findById(Long.valueOf(userId));
     Double dbBalance = dbUser.map(u -> u.getBalance())
-        .orElseThrow(() -> new BadRequestException("User not found."));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found."));
     Double updatedBalance = dbBalance + user.getBalance();
 
     // Prevent user from withdrawing beyond $0
