@@ -41,8 +41,4 @@ public class StockService {
     }
   }
 
-  // public List<StockWrapper> findStocks(final List<String> tickers) {
-  //   return tickers.stream().map(this::findStock).filter(Objects::nonNull).collect(Collectors.toList());
-  // }
-
 }

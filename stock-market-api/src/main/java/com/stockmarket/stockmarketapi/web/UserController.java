@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.stockmarket.stockmarketapi.Constants;
 import com.stockmarket.stockmarketapi.entity.User;
-import com.stockmarket.stockmarketapi.exception.ApiExceptionHandler;
 import com.stockmarket.stockmarketapi.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

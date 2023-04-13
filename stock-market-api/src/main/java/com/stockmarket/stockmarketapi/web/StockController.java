@@ -29,11 +29,4 @@ public class StockController {
     return null;
   }
 
-  // @GetMapping("/stocks")
-  // public ResponseEntity<List<StockWrapper>> getPopularStocks() {
-  // List<StockWrapper> stocks = stockService.findStocks(Arrays.asList("BABA", "GOOGL", "TSLA"));
-  // System.out.println(stocks);
-  // return new ResponseEntity<>(stocks, HttpStatus.OK);
-  // }
-
 }

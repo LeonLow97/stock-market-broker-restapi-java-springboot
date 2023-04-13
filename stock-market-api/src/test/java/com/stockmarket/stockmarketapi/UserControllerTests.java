@@ -68,9 +68,8 @@ public class UserControllerTests {
     @Test
     public void Test_LoginShouldReturn200OK() throws Exception {
         User user = new User();
-        user.setUsername("leonlow");
-        user.setBalance(1000.0);
-
+        user.setUsername("");
+        user.setBalance(0.0);
         user.setEmail("leonlow@email.com");
         user.setPassword("Password0!");
 
