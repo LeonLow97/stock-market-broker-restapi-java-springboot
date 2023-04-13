@@ -5,8 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import com.stockmarket.stockmarketapi.filters.AuthFilter;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 
 @SpringBootApplication
+@OpenAPIDefinition(
+	servers = {@Server(url = "http://localhost:8080")}
+)
 public class StockMarketApiApplication {
 
 	public static void main(String[] args) {
