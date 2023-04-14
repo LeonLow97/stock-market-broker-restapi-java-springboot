@@ -8,9 +8,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stockmarket.stockmarketapi.Constants;
 import com.stockmarket.stockmarketapi.entity.User;
@@ -20,11 +22,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import java.util.Map;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import javax.servlet.http.HttpServletRequest;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
@@ -32,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 public class UserControllerTests {
     private static final String REGISTER_PATH = "/register";
     private static final String LOGIN_PATH = "/login";
+    private static final String DEPOSIT_PATH = "/api/deposit";
+    private static final String WITHDRAW_PATH = "/api/withdraw";
 
     @Autowired
     private MockMvc mockMvc;
@@ -78,11 +83,11 @@ public class UserControllerTests {
         user.setPassword("Password0!");
 
         // Mock the validateUser method to return the registered user with userId
-        Mockito.doAnswer(invocation -> {
+        Mockito.when(userService.validateUser(Mockito.any(User.class))).thenAnswer(invocation -> {
             User registeredUser = invocation.getArgument(0);
             registeredUser.setUserId(1L);
             return registeredUser;
-        }).when(userService).validateUser(Mockito.any(User.class));
+        });
 
         String requestBody = new ObjectMapper().writeValueAsString(user);
 
@@ -96,6 +101,50 @@ public class UserControllerTests {
         String content = mvcResult.getResponse().getContentAsString();
         // Assert that the response contains a JWT token
         assertTrue(content.contains("stock-market-token"));
+    }
+
+    @Test
+    public void Test_DepositUserBalance() throws Exception {
+        User user = new User();
+        user.setUsername("leonlow");
+        user.setPassword("Password0!");
+        user.setEmail("leonlow@email.com");
+        user.setBalance(3000.0);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getAttribute("userId")).thenReturn(1);
+
+        String requestBody = new ObjectMapper().writeValueAsString(user);
+
+        // Perform the POST request to the "/register" endpoint
+        MvcResult mvcResult = mockMvc.perform(
+                put(DEPOSIT_PATH).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isOk()).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void Test_WithdrawUserBalance() throws Exception {
+        User user = new User();
+        user.setUsername("leonlow");
+        user.setPassword("Password0!");
+        user.setEmail("leonlow@email.com");
+        user.setBalance(3000.0);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getAttribute("userId")).thenReturn(1);
+
+        String requestBody = new ObjectMapper().writeValueAsString(user);
+
+        // Perform the POST request to the "/register" endpoint
+        MvcResult mvcResult = mockMvc.perform(
+                put(WITHDRAW_PATH).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isOk()).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
     }
 
     @Test

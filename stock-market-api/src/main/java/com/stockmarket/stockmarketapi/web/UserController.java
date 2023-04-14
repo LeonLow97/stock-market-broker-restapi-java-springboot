@@ -72,9 +72,9 @@ public class UserController {
                         @ApiResponse(responseCode = "404",
                                         description = "User account does not exist.")})
         @PutMapping("/api/deposit")
-        public ResponseEntity<Map<String, Boolean>> updateUserBalance(HttpServletRequest request,
+        public ResponseEntity<Map<String, Boolean>> depositUserBalance(HttpServletRequest request,
                         @RequestBody User user) {
-                int userId = (Integer) request.getAttribute("userId");
+                Integer userId = (Integer) request.getAttribute("userId");
                 userService.updateUserBalance(userId, user);
                 Map<String, Boolean> map = new HashMap<>();
                 map.put("success", true);
@@ -92,7 +92,7 @@ public class UserController {
         @PutMapping("/api/withdraw")
         public ResponseEntity<Map<String, Boolean>> withdrawUserBalance(HttpServletRequest request,
                         @RequestBody User user) {
-                int userId = (Integer) request.getAttribute("userId");
+                Integer userId = (Integer) request.getAttribute("userId");
                 user.setBalance(-1.0 * user.getBalance());
                 userService.updateUserBalance(userId, user);
                 Map<String, Boolean> map = new HashMap<>();
