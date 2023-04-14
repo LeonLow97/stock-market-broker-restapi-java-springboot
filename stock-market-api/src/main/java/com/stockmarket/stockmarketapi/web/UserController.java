@@ -100,7 +100,7 @@ public class UserController {
                 return new ResponseEntity<>(map, HttpStatus.OK);
         }
 
-        private Map<String, String> generateJWTToken(User user) {
+        public static Map<String, String> generateJWTToken(User user) {
                 long timestamp = System.currentTimeMillis();
                 String token = Jwts.builder()
                                 .signWith(SignatureAlgorithm.HS256, Constants.API_SECRET_KEY)
