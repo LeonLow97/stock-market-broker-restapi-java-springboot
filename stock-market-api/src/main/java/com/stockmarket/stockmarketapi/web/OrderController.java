@@ -23,19 +23,19 @@ public class OrderController {
 
   @GetMapping("/orders")
   public ResponseEntity<List<Order>> getAllOrders(HttpServletRequest request) {
-    int userId = (Integer) request.getAttribute("userId");
+    Integer userId = (Integer) request.getAttribute("userId");
     return new ResponseEntity<>(orderService.getAllOrders(userId), HttpStatus.OK);
   }
 
   @GetMapping("/orders/{orderId}")
   public ResponseEntity<Order> getOrder(HttpServletRequest request, @PathVariable("orderId") Integer orderId) {
-    int userId = (Integer) request.getAttribute("userId");
+    Integer userId = (Integer) request.getAttribute("userId");
     return new ResponseEntity<>(orderService.getOrder(userId, orderId), HttpStatus.OK);
   }
 
   @PostMapping("/orders")
   public ResponseEntity<Order> submitOrder(HttpServletRequest request, @RequestBody Order order) {
-    int userId = (Integer) request.getAttribute("userId");
+    Integer userId = (Integer) request.getAttribute("userId");
     orderService.submitOrder(userId, order);
     return new ResponseEntity<>(order, HttpStatus.OK);
   }

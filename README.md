@@ -63,6 +63,10 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 
 - [Swagger UI](http://localhost:8080/swagger-ui/index.html)
 
+## Unit Testing
+
+- [Controller](https://www.tutorialspoint.com/spring_boot/spring_boot_rest_controller_unit_test.htm)
+
 ## To Do
 
 - Check if it is possible to buy a stock with an invalid ticker.

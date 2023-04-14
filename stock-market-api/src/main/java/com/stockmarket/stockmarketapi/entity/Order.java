@@ -41,12 +41,13 @@ public class Order {
   @Column(name = "order_type", nullable = false)
   private String orderType;
 
+  @NonNull
   @Column(name = "no_of_shares", nullable = false)
   private int noOfShares;
 
   @NonNull
   @Column(name = "cost", nullable = false)
-  private Double cost;
+  private double cost;
 
   @Column(name = "order_date", nullable = false)
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

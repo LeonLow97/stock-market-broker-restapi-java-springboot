@@ -8,12 +8,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.stockmarket.stockmarketapi.Constants;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
@@ -59,7 +58,9 @@ public class UserControllerTests {
             return registeredUser;
         }).when(userService).registerUser(Mockito.any(User.class));
 
-        String requestBody = new ObjectMapper().writeValueAsString(user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // to enable Java 8 date/time type.
+        String requestBody = objectMapper.writeValueAsString(user);
 
         // Perform the POST request to the "/register" endpoint
         MvcResult mvcResult = mockMvc.perform(
@@ -71,7 +72,7 @@ public class UserControllerTests {
         String content = mvcResult.getResponse().getContentAsString();
         String expectedJson =
                 "{\"userId\":1,\"username\":\"leonlow\",\"email\":\"leonlow@email.com\",\"balance\":1000.0,\"isActive\":0}";
-        assertEquals(content, expectedJson);
+        assertEquals(expectedJson, content);
     }
 
     @Test
@@ -89,7 +90,9 @@ public class UserControllerTests {
             return registeredUser;
         });
 
-        String requestBody = new ObjectMapper().writeValueAsString(user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // to enable Java 8 date/time type.
+        String requestBody = objectMapper.writeValueAsString(user);
 
         // Perform the POST request to the "/login" endpoint
         MvcResult mvcResult = mockMvc.perform(
@@ -114,7 +117,9 @@ public class UserControllerTests {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
 
-        String requestBody = new ObjectMapper().writeValueAsString(user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // to enable Java 8 date/time type.
+        String requestBody = objectMapper.writeValueAsString(user);
 
         // Perform the POST request to the "/register" endpoint
         MvcResult mvcResult = mockMvc.perform(
@@ -136,7 +141,11 @@ public class UserControllerTests {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
 
-        String requestBody = new ObjectMapper().writeValueAsString(user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // to enable Java 8 date/time type.
+        String requestBody = objectMapper.writeValueAsString(user);
+        
+        // String requestBody = new ObjectMapper().writeValueAsString(user);
 
         // Perform the POST request to the "/register" endpoint
         MvcResult mvcResult = mockMvc.perform(
