@@ -31,17 +31,6 @@ public class UserController {
         @Autowired
         UserService userService;
 
-        @Operation(summary = "Login account.", description = "Provides a JWT Token for authenticated users.", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Login Request body only takes in email and password of the user."))
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Successful Login.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
-                        @ApiResponse(responseCode = "401", description = "Invalid login credentials."),
-                        @ApiResponse(responseCode = "400", description = "Bad Request. Did not fill in all fields.") })
-        @PostMapping("/login")
-        public ResponseEntity<Map<String, String>> loginUser(@RequestBody User user) {
-                user = userService.validateUser(user);
-                return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
-        }
-
         @Operation(summary = "Sign up an account.", description = "Create a new account for new users.")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "Successful creation of a new account.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))),
@@ -51,6 +40,17 @@ public class UserController {
         public ResponseEntity<User> registerUser(@RequestBody User user) {
                 userService.registerUser(user);
                 return new ResponseEntity<>(user, HttpStatus.CREATED);
+        }
+
+        @Operation(summary = "Login account.", description = "Provides a JWT Token for authenticated users.", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Login Request body only takes in email and password of the user."))
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Successful Login.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                        @ApiResponse(responseCode = "401", description = "Invalid login credentials."),
+                        @ApiResponse(responseCode = "400", description = "Bad Request. Did not fill in all fields.") })
+        @PostMapping("/login")
+        public ResponseEntity<Map<String, String>> loginUser(@RequestBody User user) {
+                user = userService.validateUser(user);
+                return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
         }
 
         @Operation(summary = "Deposit money to account.", description = "Update user balance after depositing the sum of money.")
