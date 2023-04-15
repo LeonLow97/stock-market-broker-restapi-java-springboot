@@ -37,7 +37,7 @@ public class OrderController {
   public ResponseEntity<Order> submitOrder(HttpServletRequest request, @RequestBody Order order) {
     Integer userId = (Integer) request.getAttribute("userId");
     orderService.submitOrder(userId, order);
-    return new ResponseEntity<>(order, HttpStatus.OK);
+    return new ResponseEntity<>(order, HttpStatus.CREATED);
   }
   
 }
