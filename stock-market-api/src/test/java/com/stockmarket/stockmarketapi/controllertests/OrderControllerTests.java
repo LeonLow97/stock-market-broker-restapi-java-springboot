@@ -109,7 +109,7 @@ public class OrderControllerTests {
         int orderId = Integer.parseInt(matcher.group(1));
 
         // Calling the orderService method with the extracted path parameter orderId
-        Order returnedOrder = orderService.getOrder(orderId, 1);
+        Order returnedOrder = orderService.getOrder(1, orderId);
         assertEquals(order, returnedOrder);
 
         int status = mvcResult.getResponse().getStatus();

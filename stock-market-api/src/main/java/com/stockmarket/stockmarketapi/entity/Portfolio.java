@@ -43,32 +43,31 @@ public class Portfolio {
   @Column(name = "stock_ticker", nullable = false)
   private String stockTicker;
 
+  @NonNull
   @Column(name = "no_of_shares", nullable = false)
   private int noOfShares;
 
   @NonNull
   @Column(name = "cost", nullable = false)
-  private Double cost;
+  private double cost;
 
   @NonNull
   @Column(name = "price", nullable = false)
-  private Double price;
+  private double price;
 
   @NonNull
   @Column(name = "pnl_in_percentage", nullable = false)
-  private Double PNLInPercentage;
+  private double PNLInPercentage;
 
   @NonNull
   @Column(name = "pnl_in_dollars", nullable = false)
-  private Double PNLInDollars;
+  private double PNLInDollars;
 
-  @NonNull
   @Column(name = "added_date", nullable = false)
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime addedDate = LocalDateTime.now();
 
-  @NonNull
   @Column(name = "updated_date", nullable = false)
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

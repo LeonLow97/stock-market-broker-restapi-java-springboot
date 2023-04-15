@@ -10,7 +10,7 @@ import com.stockmarket.stockmarketapi.repository.PortfolioRepository;
 
 @Service
 @Transactional
-public class PortfolioServiceImpl implements PorfolioService {
+public class PortfolioServiceImpl implements PortfolioService {
 
   @Autowired
   PortfolioRepository portfolioRepository;

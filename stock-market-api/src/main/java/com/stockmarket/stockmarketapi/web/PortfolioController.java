@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.stockmarket.stockmarketapi.entity.Portfolio;
-import com.stockmarket.stockmarketapi.service.PorfolioService;
+import com.stockmarket.stockmarketapi.service.PortfolioService;
 
 @RestController
 @RequestMapping("/api")
 public class PortfolioController {
 
   @Autowired
-  PorfolioService portfolioService;
+  PortfolioService portfolioService;
 
   @GetMapping("/portfolio")
   public ResponseEntity<List<Portfolio>> getPortfolio(HttpServletRequest request) {
-    int userId = (Integer) request.getAttribute("userId");
+    Integer userId = (Integer) request.getAttribute("userId");
     List<Portfolio> portfolio = portfolioService.getPortfolio(userId);
     return new ResponseEntity<>(portfolio, HttpStatus.OK);
   }
@@ -29,7 +29,7 @@ public class PortfolioController {
   @GetMapping("/portfolio/{portfolioId}")
   public ResponseEntity<Portfolio> getPortfolioStock(HttpServletRequest request,
       @PathVariable("portfolioId") Integer portfolioId) {
-    int userId = (Integer) request.getAttribute("userId");
+    Integer userId = (Integer) request.getAttribute("userId");
     Portfolio portfolio = portfolioService.getPortfolioStock(userId, portfolioId);
     return new ResponseEntity<>(portfolio, HttpStatus.OK);
   }
