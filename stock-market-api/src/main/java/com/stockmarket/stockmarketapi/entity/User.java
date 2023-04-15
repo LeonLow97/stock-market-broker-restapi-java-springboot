@@ -22,7 +22,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Long userId;
+    private long userId;
 
     @NonNull
     @Column(name = "username", nullable = false)
@@ -42,6 +42,7 @@ public class User {
     private Double balance;
 
     @Column(name = "is_active", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int isActive;
 
     @Column(name = "added_date", nullable = false)

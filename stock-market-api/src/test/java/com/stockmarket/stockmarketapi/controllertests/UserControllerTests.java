@@ -1,34 +1,37 @@
 package com.stockmarket.stockmarketapi.controllertests;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.stockmarket.stockmarketapi.Constants;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import com.stockmarket.stockmarketapi.web.UserController;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class UserControllerTests {
@@ -37,146 +40,128 @@ public class UserControllerTests {
     private static final String DEPOSIT_PATH = "/api/deposit";
     private static final String WITHDRAW_PATH = "/api/withdraw";
 
+    private User newUser;
+
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private UserService userService;
 
+    @BeforeEach
+    void setup() {
+        newUser = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0);
+        newUser.setUserId(1L);
+        newUser.setIsActive(1);
+    }
+
     @Test
     public void Test_RegisterShouldReturn201Created() throws Exception {
-        User user = new User();
-        user.setUsername("leonlow");
-        user.setPassword("Password0!");
-        user.setEmail("leonlow@email.com");
-        user.setBalance(1000.0);
+        // Arrange
+        when(userService.registerUser(any(User.class))).thenReturn(newUser);
+        String requestBody = objectMapper.writeValueAsString(newUser);
 
-        // Mock the registerUser method to return the registered user with userId
-        Mockito.doAnswer(invocation -> {
-            User registeredUser = invocation.getArgument(0);
-            registeredUser.setUserId(1L);
-            return registeredUser;
-        }).when(userService).registerUser(Mockito.any(User.class));
+        // Act
+        MvcResult mvcResult = mockMvc.perform(post(REGISTER_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody))
+            .andExpect(status().isCreated())
+            .andReturn();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // to enable Java 8 date/time type.
-        String requestBody = objectMapper.writeValueAsString(user);
-
-        // Perform the POST request to the "/register" endpoint
-        MvcResult mvcResult = mockMvc.perform(
-                post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isCreated()).andReturn();
-
+        // Assert
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(201, status);
         String content = mvcResult.getResponse().getContentAsString();
-        String expectedJson =
-                "{\"userId\":1,\"username\":\"leonlow\",\"email\":\"leonlow@email.com\",\"balance\":1000.0,\"isActive\":0}";
+        String expectedJson = "{\"userId\":1,\"username\":\"leonlow\",\"email\":\"leonlow@email.com\",\"balance\":1000.0}";
+        assertEquals(201, status);
         assertEquals(expectedJson, content);
     }
 
     @Test
     public void Test_LoginShouldReturn200OK() throws Exception {
-        User user = new User();
-        user.setUsername("");
-        user.setBalance(0.0);
-        user.setEmail("leonlow@email.com");
-        user.setPassword("Password0!");
+        // Arrange
+        when(userService.validateUser(any(User.class))).thenReturn(newUser);
+        String requestBody = objectMapper.writeValueAsString(newUser);
 
-        // Mock the validateUser method to return the registered user with userId
-        Mockito.when(userService.validateUser(Mockito.any(User.class))).thenAnswer(invocation -> {
-            User registeredUser = invocation.getArgument(0);
-            registeredUser.setUserId(1L);
-            return registeredUser;
-        });
+        // Act
+        MvcResult mvcResult = mockMvc.perform(post(LOGIN_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isOk())
+                .andReturn();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // to enable Java 8 date/time type.
-        String requestBody = objectMapper.writeValueAsString(user);
-
-        // Perform the POST request to the "/login" endpoint
-        MvcResult mvcResult = mockMvc.perform(
-                post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isOk()).andReturn();
-
+        // Assert
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(200, status);
         String content = mvcResult.getResponse().getContentAsString();
+        assertEquals(200, status);
         // Assert that the response contains a JWT token
         assertTrue(content.contains("stock-market-token"));
     }
 
     @Test
     public void Test_DepositUserBalance() throws Exception {
-        User user = new User();
-        user.setUsername("leonlow");
-        user.setPassword("Password0!");
-        user.setEmail("leonlow@email.com");
-        user.setBalance(3000.0);
-
+        // Arrange
+        newUser.setBalance(3000.0);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
+        String requestBody = objectMapper.writeValueAsString(newUser);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // to enable Java 8 date/time type.
-        String requestBody = objectMapper.writeValueAsString(user);
+        // Action
+        MvcResult mvcResult = mockMvc.perform(put(DEPOSIT_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isOk())
+                .andReturn();
 
-        // Perform the POST request to the "/register" endpoint
-        MvcResult mvcResult = mockMvc.perform(
-                put(DEPOSIT_PATH).contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isOk()).andReturn();
-
+        // Assert
         int status = mvcResult.getResponse().getStatus();
+        String content = mvcResult.getResponse().getContentAsString();
+        String expectedJson = "{\"success\":true}";
         assertEquals(200, status);
+        assertEquals(expectedJson, content);
     }
 
     @Test
     public void Test_WithdrawUserBalance() throws Exception {
-        User user = new User();
-        user.setUsername("leonlow");
-        user.setPassword("Password0!");
-        user.setEmail("leonlow@email.com");
-        user.setBalance(3000.0);
-
+        // Arrange
+        newUser.setBalance(2000.0);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
+        String requestBody = objectMapper.writeValueAsString(newUser);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // to enable Java 8 date/time type.
-        String requestBody = objectMapper.writeValueAsString(user);
-        
-        // String requestBody = new ObjectMapper().writeValueAsString(user);
+        // Action
+        MvcResult mvcResult = mockMvc.perform(put(WITHDRAW_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isOk())
+                .andReturn();
 
-        // Perform the POST request to the "/register" endpoint
-        MvcResult mvcResult = mockMvc.perform(
-                put(WITHDRAW_PATH).contentType(MediaType.APPLICATION_JSON).content(requestBody))
-                .andExpect(status().isOk()).andReturn();
-
+        // Assert
         int status = mvcResult.getResponse().getStatus();
+        String content = mvcResult.getResponse().getContentAsString();
+        String expectedJson = "{\"success\":true}";
         assertEquals(200, status);
+        assertEquals(expectedJson, content);
     }
 
     @Test
     public void Test_GenerateJWTToken() {
-        // Mock user object
-        User user = new User();
-        user.setUserId(123L);
-        user.setEmail("leonlow@testing.com");
+        // Arrange
+        newUser.setUserId(123L);
 
-        // Call the method under test
-        // JWTTokenGenerator generator = new JWTTokenGenerator();
-        Map<String, String> tokenMap = UserController.generateJWTToken(user);
-
-        // Verify that a token has been generated
+        // Action
+        Map<String, String> tokenMap = UserController.generateJWTToken(newUser);
+        
+        // Assert
         assertTrue(tokenMap.containsKey("stock-market-token"));
         String token = tokenMap.get("stock-market-token");
 
-        // Verify the token claims
         Claims claims = Jwts.parser().setSigningKey(Constants.API_SECRET_KEY).parseClaimsJws(token)
                 .getBody();
         assertEquals(123L, claims.get("userId", Long.class));
-        assertEquals("leonlow@testing.com", claims.get("email", String.class));
-
+        assertEquals("leonlow@email.com", claims.get("email", String.class));
         // Verify the token signature
         assertTrue(Jwts.parser().isSigned(token));
     }
