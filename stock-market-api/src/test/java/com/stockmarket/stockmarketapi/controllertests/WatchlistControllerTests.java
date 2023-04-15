@@ -50,6 +50,10 @@ public class WatchlistControllerTests {
 
     @BeforeEach
     void setup() {
+        assertNotNull(mockMvc);
+        assertNotNull(objectMapper);
+        assertNotNull(watchlistService);
+
         testWatchlist = Arrays.asList(
                 new Watchlist(Long.valueOf(1), "Tesla, Inc.", "TSLA", 128.33, 125.13, 208.15, 200.1, 80.0, 0.0),
                 new Watchlist(Long.valueOf(1), "Alibaba Group Holding Limited", "BABA", 98.12, 96.54, 138.17, 58.7,

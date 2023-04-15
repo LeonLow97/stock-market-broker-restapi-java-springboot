@@ -21,6 +21,7 @@ import com.stockmarket.stockmarketapi.web.UserController;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -45,6 +46,10 @@ public class UserControllerTests {
 
     @BeforeEach
     void setup() {
+        assertNotNull(mockMvc);
+        assertNotNull(objectMapper);
+        assertNotNull(userService);
+
         testUser = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0);
         testUser.setUserId(1L);
         testUser.setIsActive(1);

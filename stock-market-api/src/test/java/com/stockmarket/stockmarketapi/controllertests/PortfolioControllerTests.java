@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.mock;
@@ -43,6 +44,9 @@ public class PortfolioControllerTests {
 
     @BeforeEach
     void setup() {
+        assertNotNull(mockMvc);
+        assertNotNull(portfolioService);
+
         testPortfolio = Arrays.asList(
                 new Portfolio(Long.valueOf(1), "Tesla, Inc.", "TSLA", 600, 128.33, 208.15, 80.0, 0.0),
                 new Portfolio(Long.valueOf(1), "Alibaba Group Holding Limited", "BABA", 210, 98.12, 138.17, 70.0, 0.0),

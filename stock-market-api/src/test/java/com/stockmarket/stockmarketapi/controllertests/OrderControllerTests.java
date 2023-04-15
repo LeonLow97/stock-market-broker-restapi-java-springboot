@@ -50,6 +50,10 @@ public class OrderControllerTests {
 
     @BeforeEach
     void setup() {
+        assertNotNull(mockMvc);
+        assertNotNull(objectMapper);
+        assertNotNull(orderService);
+        
         testOrders = Arrays.asList(new Order(Long.valueOf(1), "AAPL", "BUY", 100, 166.7),
                 new Order(Long.valueOf(1), "GOOGL", "SELL", 50, 1250.5),
                 new Order(Long.valueOf(1), "TSLA", "BUY", 200, 735.0),

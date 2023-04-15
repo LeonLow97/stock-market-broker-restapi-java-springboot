@@ -13,6 +13,7 @@ import com.stockmarket.stockmarketapi.service.StockService;
 import com.stockmarket.stockmarketapi.stockmodel.StockData;
 import com.stockmarket.stockmarketapi.web.StockController;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.when;
@@ -36,6 +37,9 @@ public class StockControllerTests {
 
     @BeforeEach
     void setup() {
+        assertNotNull(mockMvc);
+        assertNotNull(stockService);
+
         // Mocking the stock data with all arguments constructor
         BigDecimal previousDayClose = new BigDecimal("96.17");
         BigDecimal stockPrice = new BigDecimal("94.55");
