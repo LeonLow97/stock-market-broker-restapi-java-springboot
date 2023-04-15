@@ -103,7 +103,7 @@ public class UserControllerTests {
         when(request.getAttribute("userId")).thenReturn(1);
         String requestBody = objectMapper.writeValueAsString(testUser);
 
-        // Action
+        // Act
         MvcResult mvcResult = mockMvc.perform(put(DEPOSIT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
@@ -126,7 +126,7 @@ public class UserControllerTests {
         when(request.getAttribute("userId")).thenReturn(1);
         String requestBody = objectMapper.writeValueAsString(testUser);
 
-        // Action
+        // Act
         MvcResult mvcResult = mockMvc.perform(put(WITHDRAW_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
@@ -146,9 +146,9 @@ public class UserControllerTests {
         // Arrange
         testUser.setUserId(123L);
 
-        // Action
+        // Act
         Map<String, String> tokenMap = UserController.generateJWTToken(testUser);
-        
+
         // Assert
         assertTrue(tokenMap.containsKey("stock-market-token"));
         String token = tokenMap.get("stock-market-token");
