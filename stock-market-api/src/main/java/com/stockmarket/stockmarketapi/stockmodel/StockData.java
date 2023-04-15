@@ -20,7 +20,7 @@ public class StockData {
   private BigDecimal dayLow;
   private BigDecimal dayChangeInPercent;
   private BigDecimal _52WeekChangeInPercent;
-  private BigDecimal _52WeekHighHigh;
+  private BigDecimal _52WeekHigh;
   private BigDecimal yearDividendInPercent;
 
 }

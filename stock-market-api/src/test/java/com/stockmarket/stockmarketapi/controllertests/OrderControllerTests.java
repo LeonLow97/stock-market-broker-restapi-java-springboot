@@ -102,7 +102,7 @@ public class OrderControllerTests {
                 return requestBuilder;
             })).andExpect(status().isOk()).andReturn();
             
-        // Extract value from path parameter
+        // Extract value from path parameter (regex to capture one or more digits 0-9)
         Pattern pattern = Pattern.compile("/api/orders/(\\d+)");
         Matcher matcher = pattern.matcher(mvcResult.getRequest().getRequestURI());
         matcher.find();
@@ -110,7 +110,6 @@ public class OrderControllerTests {
 
         // Calling the orderService method with the extracted path parameter orderId
         Order returnedOrder = orderService.getOrder(orderId, 1);
-        
         assertEquals(order, returnedOrder);
 
         int status = mvcResult.getResponse().getStatus();

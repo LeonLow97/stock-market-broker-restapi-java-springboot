@@ -31,7 +31,7 @@ public class StockService {
       stockData.setDayLow(stockWrapper.getStock().getQuote().getDayLow());
       stockData.setDayChangeInPercent(stockWrapper.getStock().getQuote().getChangeInPercent());
       stockData.set_52WeekChangeInPercent(stockWrapper.getStock().getQuote().getChangeFromYearHighInPercent());
-      stockData.set_52WeekHighHigh(stockWrapper.getStock().getQuote().getYearHigh());
+      stockData.set_52WeekHigh(stockWrapper.getStock().getQuote().getYearHigh());
       stockData.setYearDividendInPercent(stockWrapper.getStock().getDividend().getAnnualYieldPercent());
 
       return stockData;
