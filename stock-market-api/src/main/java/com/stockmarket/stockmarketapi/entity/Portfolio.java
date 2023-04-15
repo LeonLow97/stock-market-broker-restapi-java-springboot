@@ -28,12 +28,12 @@ public class Portfolio {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @JsonIgnore
   @Column(name = "portfolio_id", nullable = false)
-  private Long portfolioId;
+  private long portfolioId;
 
   @NonNull
   @JsonIgnore
   @Column(name = "user_id", nullable = false)
-  private Long userId;
+  private long userId;
 
   @NonNull
   @Column(name = "stock_name", nullable = false)

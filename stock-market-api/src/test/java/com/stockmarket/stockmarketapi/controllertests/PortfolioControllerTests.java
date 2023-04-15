@@ -70,7 +70,6 @@ public class PortfolioControllerTests {
         assertEquals(200, status);
 
         String responseBody = mvcResult.getResponse().getContentAsString();
-        System.out.println(responseBody);
         JSONArray jsonArray = new JSONArray(responseBody);
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);

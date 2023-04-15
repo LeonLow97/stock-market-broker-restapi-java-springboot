@@ -136,7 +136,6 @@ public class OrderServiceImpl implements OrderService {
         if (type == ORDER_TYPE.BUY) {
           order.setCost(stockQuote.getDayHigh().doubleValue());
           dbBalance = dbBalance - (order.getNoOfShares() * stockQuote.getDayHigh().doubleValue());
-          System.out.println("Here: " + dbBalance + " " + order.getNoOfShares());
         } else if (type == ORDER_TYPE.SELL) {
           throw new OrderNotFilledException(
               "Order not filled as price is more than highest ask price on " + LocalDateTime.now());
