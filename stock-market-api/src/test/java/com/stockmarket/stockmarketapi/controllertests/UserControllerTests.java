@@ -13,20 +13,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stockmarket.stockmarketapi.Constants;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import com.stockmarket.stockmarketapi.web.UserController;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -40,7 +35,7 @@ public class UserControllerTests {
     private static final String DEPOSIT_PATH = "/api/deposit";
     private static final String WITHDRAW_PATH = "/api/withdraw";
 
-    private User newUser;
+    private User testUser;
 
     @Autowired
     private MockMvc mockMvc;
@@ -53,16 +48,16 @@ public class UserControllerTests {
 
     @BeforeEach
     void setup() {
-        newUser = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0);
-        newUser.setUserId(1L);
-        newUser.setIsActive(1);
+        testUser = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0);
+        testUser.setUserId(1L);
+        testUser.setIsActive(1);
     }
 
     @Test
     public void Test_RegisterShouldReturn201Created() throws Exception {
         // Arrange
-        when(userService.registerUser(any(User.class))).thenReturn(newUser);
-        String requestBody = objectMapper.writeValueAsString(newUser);
+        when(userService.registerUser(any(User.class))).thenReturn(testUser);
+        String requestBody = objectMapper.writeValueAsString(testUser);
 
         // Act
         MvcResult mvcResult = mockMvc.perform(post(REGISTER_PATH)
@@ -82,8 +77,8 @@ public class UserControllerTests {
     @Test
     public void Test_LoginShouldReturn200OK() throws Exception {
         // Arrange
-        when(userService.validateUser(any(User.class))).thenReturn(newUser);
-        String requestBody = objectMapper.writeValueAsString(newUser);
+        when(userService.validateUser(any(User.class))).thenReturn(testUser);
+        String requestBody = objectMapper.writeValueAsString(testUser);
 
         // Act
         MvcResult mvcResult = mockMvc.perform(post(LOGIN_PATH)
@@ -103,10 +98,10 @@ public class UserControllerTests {
     @Test
     public void Test_DepositUserBalance() throws Exception {
         // Arrange
-        newUser.setBalance(3000.0);
+        testUser.setBalance(3000.0);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
-        String requestBody = objectMapper.writeValueAsString(newUser);
+        String requestBody = objectMapper.writeValueAsString(testUser);
 
         // Action
         MvcResult mvcResult = mockMvc.perform(put(DEPOSIT_PATH)
@@ -126,10 +121,10 @@ public class UserControllerTests {
     @Test
     public void Test_WithdrawUserBalance() throws Exception {
         // Arrange
-        newUser.setBalance(2000.0);
+        testUser.setBalance(2000.0);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
-        String requestBody = objectMapper.writeValueAsString(newUser);
+        String requestBody = objectMapper.writeValueAsString(testUser);
 
         // Action
         MvcResult mvcResult = mockMvc.perform(put(WITHDRAW_PATH)
@@ -149,10 +144,10 @@ public class UserControllerTests {
     @Test
     public void Test_GenerateJWTToken() {
         // Arrange
-        newUser.setUserId(123L);
+        testUser.setUserId(123L);
 
         // Action
-        Map<String, String> tokenMap = UserController.generateJWTToken(newUser);
+        Map<String, String> tokenMap = UserController.generateJWTToken(testUser);
         
         // Assert
         assertTrue(tokenMap.containsKey("stock-market-token"));
