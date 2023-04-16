@@ -48,8 +48,7 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public Order getOrder(int userId, int orderId) {
-    Order order =
-        orderRepository.findByUserIdAndOrderId(Long.valueOf(userId), Long.valueOf(orderId));
+    Order order = orderRepository.findByUserIdAndOrderId(Long.valueOf(userId), Long.valueOf(orderId));
     if (order == null) {
       throw new ResourceNotFoundException("No order was found.");
     }
@@ -58,34 +57,32 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public Order submitOrder(int userId, Order order) {
-    // Trim Fields
-    order.setOrderType(order.getOrderType().trim());
-
-    if (order.getStockTicker() == null || order.getStockTicker().isBlank()
-        || order.getOrderType() == null || order.getOrderType().isBlank()) {
-      throw new BadRequestException("Fill in all fields.");
-    }
-    if (order.getStockTicker().length() > 20) {
-      throw new BadRequestException("Stock Ticker has a maximum of 20 characters.");
-    }
-    if (order.getOrderType().length() > 4) {
-      throw new BadRequestException("Order Type has a maximum of 4 characters.");
-    }
-
-    ORDER_TYPE type = ORDER_TYPE.valueOf(order.getOrderType().toUpperCase());
-    if (type == null) {
-      throw new BadRequestException("Order Type must be BUY or SELL.");
-    }
-    if (order.getNoOfShares() < 0) {
-      throw new BadRequestException("Number of shares cannot be negative.");
-    }
-    if (order.getCost() < 0) {
-      throw new BadRequestException("Price cannot be negative.");
-    }
 
     order.setUserId(Long.valueOf(userId));
 
     try {
+      // Trim Fields
+      order.setOrderType(order.getOrderType().trim());
+
+      if (order.getStockTicker().isBlank()
+          || order.getOrderType().isBlank()) {
+        throw new BadRequestException("Fill in all fields.");
+      }
+      if (order.getStockTicker().length() > 20) {
+        throw new BadRequestException("Stock Ticker has a maximum of 20 characters.");
+      }
+      if (order.getOrderType().length() > 4) {
+        throw new BadRequestException("Order Type has a maximum of 4 characters.");
+      }
+
+      ORDER_TYPE type = ORDER_TYPE.valueOf(order.getOrderType().toUpperCase());
+      if (order.getNoOfShares() < 0) {
+        throw new BadRequestException("Number of shares cannot be negative.");
+      }
+      if (order.getCost() < 0) {
+        throw new BadRequestException("Price cannot be negative.");
+      }
+
       // Retrieve user's current portfolio details
       Portfolio dbPortfolio = portfolioRepository.findByUserIdAndStockTicker(Long.valueOf(userId),
           order.getStockTicker().trim());
@@ -107,12 +104,13 @@ public class OrderServiceImpl implements OrderService {
       // Check if user's account has sufficient funds
       Optional<User> dbUser = userRepository.findById(Long.valueOf(userId));
       if (!dbUser.isPresent()) {
-        throw new ResourceNotFoundException("User not found");
+        throw new ResourceNotFoundException("User not found.");
       }
       Double dbBalance = dbUser.map(u -> u.getBalance())
-          .orElseThrow(() -> new BadRequestException("User not found"));
+          .orElseThrow(() -> new BadRequestException("User not found."));
 
-      // Check if user has sufficient funds to purchase stocks and specified number of shares &
+      // Check if user has sufficient funds to purchase stocks and specified number of
+      // shares &
       // price
       Double cost = order.getCost() * order.getNoOfShares();
       if (dbBalance < cost && type == ORDER_TYPE.BUY) {
@@ -193,9 +191,12 @@ public class OrderServiceImpl implements OrderService {
 
       return order;
     } catch (IOException e) {
-      System.out.println("Failed to connect to YahooFinanceAPI: " + e.getMessage());
+      throw new BadRequestException("Error connecting with Yahoo Finance API");
+    } catch (NullPointerException e) {
+      throw new NullPointerException("NullPointerException: " + e.getMessage());
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException("Order Type must be BUY or SELL.");
     }
-    return null;
   }
 
   private Portfolio calculateStockPortfolioData(Portfolio portfolio, Order order) {

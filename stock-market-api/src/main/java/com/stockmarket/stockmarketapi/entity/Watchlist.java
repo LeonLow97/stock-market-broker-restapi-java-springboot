@@ -26,11 +26,11 @@ public class Watchlist {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @JsonIgnore
   @Column(name = "watchlist_id", nullable = false)
-  private Long watchlistId;
+  private long watchlistId;
 
   @NonNull
   @Column(name = "user_id", nullable = false)
-  private Long userId;
+  private long userId;
 
   @NonNull
   @Column(name = "stock_name", nullable = false)
@@ -42,27 +42,27 @@ public class Watchlist {
 
   @NonNull
   @Column(name = "price", nullable = false)
-  private Double price;
+  private double price;
 
   @NonNull
   @Column(name = "previous_day_close", nullable = false)
-  private Double previousDayClose;
+  private double previousDayClose;
 
   @NonNull
   @Column(name = "_52_week_high", nullable = false)
-  private Double _52WeekHigh;
+  private double _52WeekHigh;
 
   @NonNull
   @Column(name = "_52_week_low", nullable = false)
-  private Double _52WeekLow;
+  private double _52WeekLow;
 
   @NonNull
   @Column(name = "market_cap_in_billions", nullable = false)
-  private Double marketCapInBillions;
+  private double marketCapInBillions;
 
   @NonNull
   @Column(name = "annual_dividend_yield", nullable = false)
-  private Double annualDividendYield;
+  private double annualDividendYield;
 
   @NonNull
   @JsonIgnore
