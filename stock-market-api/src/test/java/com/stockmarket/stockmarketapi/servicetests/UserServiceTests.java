@@ -12,6 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -291,5 +294,35 @@ public class UserServiceTests {
 
         // Act and Assert
         assertThrows(AuthException.class, () -> userServiceImpl.validateUser(user));
+    }
+
+    @Test
+    public void Test_UpdateUserBalanceWhenUserIsValid() {
+        // Arrange
+        User user = new User("leonlow", "Password0!", "leonlow@service.com", 1500.0);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(registeredUser));
+        when(userRepository.save(registeredUser)).thenReturn(registeredUser);
+
+        // Act
+        userServiceImpl.updateUserBalance(1, user);
+
+        // Assert
+        assertEquals(registeredUser.getBalance(), 2500.0);
+        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).save(registeredUser);
+    }
+
+    @Test
+    public void Test_UpdateUserBalanceWithInsufficientBalance() {
+        // Arrange
+        User user = new User("leonlow", "Password0!", "leonlow@service.com", -3000.0);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(registeredUser));
+
+        // Act
+        Throwable exception = assertThrows(BadRequestException.class, () -> {
+            userServiceImpl.updateUserBalance(1, user);
+        });
+
+        assertEquals("Balance is insufficient for the specified withdrawal amount.", exception.getMessage());
     }
 }
