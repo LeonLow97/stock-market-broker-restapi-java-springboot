@@ -4,19 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.stockmarket.stockmarketapi.entity.Order;
-import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.repository.OrderRepository;
 import com.stockmarket.stockmarketapi.repository.UserRepository;
 
@@ -29,14 +23,6 @@ public class OrderRepositoryTests {
 
     @Autowired
     private UserRepository userRepository;
-
-    private Order order;
-    private User user;
-
-    @BeforeEach
-    void setup() {
-        order = new Order(1L, "GOOGL", "BUY", 50, 128.31);
-    }
 
     @Test
     void InjectedComponentsAreNotNull() {
