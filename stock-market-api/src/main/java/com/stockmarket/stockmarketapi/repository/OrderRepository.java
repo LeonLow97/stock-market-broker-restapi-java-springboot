@@ -6,8 +6,8 @@ import com.stockmarket.stockmarketapi.entity.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-  List<Order> findAllByUserId(Long userId);
+  List<Order> findAllByUserId(long userId);
 
-  Order findByUserIdAndOrderId(Long userId, Long orderId);
+  Order findByUserIdAndOrderId(long userId, long orderId);
 
 }

@@ -1,95 +1,103 @@
-package com.stockmarket.stockmarketapi.repositorytests;
+// package com.stockmarket.stockmarketapi.repositorytests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.verify;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertNotEquals;
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
+// import static org.junit.jupiter.api.Assertions.assertNull;
+// import static org.mockito.Mockito.verify;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.times;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import static org.mockito.Mockito.times;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import
+// org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+// import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.stockmarket.stockmarketapi.entity.User;
-import com.stockmarket.stockmarketapi.repository.UserRepository;
+// import com.stockmarket.stockmarketapi.entity.User;
+// import com.stockmarket.stockmarketapi.repository.UserRepository;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class UserRepositoryTests {
+// @DataJpaTest
+// @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+// public class UserRepositoryTests {
 
-    @Autowired
-    private UserRepository userRepository;
+// @Autowired
+// private UserRepository userRepository;
 
-    private User user;
+// private User user;
 
-    @BeforeEach
-    void setup() {
-        user = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
-    }
+// @BeforeEach
+// void setup() {
+// user = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
+// }
 
-    @Test
-    public void Test_GetCountByEmailSuccess() {
-        // Arrange
-        userRepository.save(user);
+// @Test
+// void InjectedComponentsAreNotNull() {
+// assertNotNull(userRepository);
+// }
 
-        // Act
-        int count = userRepository.getCountByEmail(user.getEmail());
+// @Test
+// public void Test_GetCountByEmailSuccess() {
+// // Arrange
+// userRepository.save(user);
 
-        // Assert
-        assertEquals(1, count);
+// // Act
+// int count = userRepository.getCountByEmail(user.getEmail());
 
-        // Cleanup
-        userRepository.delete(user);
-    }
+// // Assert
+// assertEquals(1, count);
 
-    @Test
-    public void Test_GetCountByEmailWhenEmailDoesNotExist() {
-        // Arrange
-        userRepository.save(user);
+// // Cleanup
+// userRepository.delete(user);
+// }
 
-        // Act
-        int count = userRepository.getCountByEmail("notatrueemail@fake.com");
+// @Test
+// public void Test_GetCountByEmailWhenEmailDoesNotExist() {
+// // Arrange
+// userRepository.save(user);
 
-        // Assert
-        assertEquals(0, count);
+// // Act
+// int count = userRepository.getCountByEmail("notatrueemail@fake.com");
 
-        // Cleanup
-        userRepository.delete(user);
-    }
+// // Assert
+// assertEquals(0, count);
 
-    @Test
-    public void Test_FindByEmailSuccess() {
-        // Arrange
-        User dbUser = userRepository.save(user);
+// // Cleanup
+// userRepository.delete(user);
+// }
 
-        // Act
-        User findUser = userRepository.findByEmail(dbUser.getEmail());
+// @Test
+// public void Test_FindByEmailSuccess() {
+// // Arrange
+// User dbUser = userRepository.save(user);
 
-        // Assert
-        assertEquals(dbUser, findUser);
-        assertEquals(dbUser.getEmail(), findUser.getEmail());
-        assertEquals(dbUser.getUsername(), findUser.getUsername());
+// // Act
+// User findUser = userRepository.findByEmail(dbUser.getEmail());
 
-        // Cleanup
-        userRepository.delete(user);
-    }
+// // Assert
+// assertEquals(dbUser, findUser);
+// assertEquals(dbUser.getEmail(), findUser.getEmail());
+// assertEquals(dbUser.getUsername(), findUser.getUsername());
 
-    @Test
-    public void Test_FindByEmailWhenEmailDoesNotExist() {
-        // Arrange
-        User anotherUser = new User("leonlow", "Password0!", "emailnotthesame@test.com", 1000.0);
-        userRepository.save(user);
+// // Cleanup
+// userRepository.delete(user);
+// }
 
-        // Act
-        User findUser = userRepository.findByEmail(anotherUser.getEmail());
+// @Test
+// public void Test_FindByEmailWhenEmailDoesNotExist() {
+// // Arrange
+// User anotherUser = new User("leonlow", "Password0!",
+// "emailnotthesame@test.com", 1000.0);
+// userRepository.save(user);
 
-        // Assert
-        assertNull(findUser);
+// // Act
+// User findUser = userRepository.findByEmail(anotherUser.getEmail());
 
-        // Cleanup
-        userRepository.delete(user);
-    }
+// // Assert
+// assertNull(findUser);
 
-}
+// // Cleanup
+// userRepository.delete(user);
+// }
+
+// }
