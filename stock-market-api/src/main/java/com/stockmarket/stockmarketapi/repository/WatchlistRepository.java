@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.stockmarket.stockmarketapi.entity.Watchlist;
 
 public interface WatchlistRepository extends JpaRepository<Watchlist, Long> {
-  
-    List<Watchlist> findAllByUserId(Long userId);
-    Watchlist findByUserIdAndStockTicker(Long userId, String stockTicker);
-    void removeByUserIdAndStockTicker(Long userId, String stockTicker);
+
+    List<Watchlist> findAllByUserId(long userId);
+
+    Watchlist findByUserIdAndStockTicker(long userId, String stockTicker);
+
+    void removeByUserIdAndStockTicker(long userId, String stockTicker);
 
 }
