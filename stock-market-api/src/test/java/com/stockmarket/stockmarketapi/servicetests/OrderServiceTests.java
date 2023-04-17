@@ -8,14 +8,10 @@ import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,18 +22,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.stockmarket.stockmarketapi.entity.Order;
 import com.stockmarket.stockmarketapi.entity.Portfolio;
 import com.stockmarket.stockmarketapi.entity.User;
-import com.stockmarket.stockmarketapi.exception.AuthException;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
 import com.stockmarket.stockmarketapi.exception.OrderNotFilledException;
-import com.stockmarket.stockmarketapi.exception.ResourceAlreadyExistsException;
 import com.stockmarket.stockmarketapi.exception.ResourceNotFoundException;
 import com.stockmarket.stockmarketapi.repository.OrderRepository;
 import com.stockmarket.stockmarketapi.repository.PortfolioRepository;
 import com.stockmarket.stockmarketapi.repository.UserRepository;
 import com.stockmarket.stockmarketapi.service.OrderServiceImpl;
-
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
 import yahoofinance.quotes.stock.StockQuote;
 
 @ExtendWith(MockitoExtension.class)

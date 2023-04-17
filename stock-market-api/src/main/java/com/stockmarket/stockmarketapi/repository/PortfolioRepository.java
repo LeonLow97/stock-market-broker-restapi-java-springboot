@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.stockmarket.stockmarketapi.entity.Portfolio;
 
 public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
-  
-  Portfolio findByUserIdAndStockTicker(Long userId, String stockTicker);
-  List<Portfolio> findAllByUserId(Long userId);
-  Portfolio findByUserIdAndPortfolioId(Long userId, Long portfolioId);
+
+  Portfolio findByUserIdAndStockTicker(long userId, String stockTicker);
+
+  List<Portfolio> findAllByUserId(long userId);
+
+  Portfolio findByUserIdAndPortfolioId(long userId, long portfolioId);
 
 }
