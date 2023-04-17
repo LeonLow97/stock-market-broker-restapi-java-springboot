@@ -7,7 +7,7 @@ import com.stockmarket.stockmarketapi.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
   @Query(value = "SELECT COUNT(*) FROM accounts a WHERE a.email = ?1", nativeQuery = true)
-  Integer getCountByEmail(String email);
+  int getCountByEmail(String email);
 
   User findByEmail(String email);
 
