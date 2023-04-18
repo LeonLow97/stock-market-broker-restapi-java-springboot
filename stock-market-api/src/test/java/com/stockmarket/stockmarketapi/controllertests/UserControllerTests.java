@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stockmarket.stockmarketapi.Constants;
 import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
+import com.stockmarket.stockmarketapi.DTOs.UserRegisterDTO;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import com.stockmarket.stockmarketapi.web.UserController;
@@ -51,7 +52,7 @@ public class UserControllerTests {
         assertNotNull(objectMapper);
         assertNotNull(userService);
 
-        testUser = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0);
+        testUser = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0, 1);
         testUser.setUserId(1L);
         testUser.setIsActive(1);
     }
@@ -59,7 +60,8 @@ public class UserControllerTests {
     @Test
     public void Test_RegisterShouldReturn201Created() throws Exception {
         // Arrange
-        when(userService.registerUser(any(User.class))).thenReturn(testUser);
+        UserRegisterDTO userRegisterDTO = new UserRegisterDTO("leonlow", "leonlow@email.com", "Password0!");
+        when(userService.registerUser(any(UserRegisterDTO.class))).thenReturn(userRegisterDTO);
         String requestBody = objectMapper.writeValueAsString(testUser);
 
         // Act
@@ -72,7 +74,7 @@ public class UserControllerTests {
         // Assert
         int status = mvcResult.getResponse().getStatus();
         String content = mvcResult.getResponse().getContentAsString();
-        String expectedJson = "{\"userId\":1,\"username\":\"leonlow\",\"email\":\"leonlow@email.com\",\"balance\":1000.0}";
+        String expectedJson = "{\"username\":\"leonlow\",\"email\":\"leonlow@email.com\"}";
         assertEquals(201, status);
         assertEquals(expectedJson, content);
     }
@@ -95,7 +97,7 @@ public class UserControllerTests {
         String content = mvcResult.getResponse().getContentAsString();
         assertEquals(200, status);
         // Assert that the response contains a JWT token
-        assertTrue(content.contains("stock-market-token"));
+        assertTrue(content.contains("accessToken"));
     }
 
     @Test
@@ -109,7 +111,10 @@ public class UserControllerTests {
         // Act
         MvcResult mvcResult = mockMvc.perform(put(DEPOSIT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                .content(requestBody).with(requestBuilder -> {
+                    requestBuilder.setAttribute("userId", 1);
+                    return requestBuilder;
+                }))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -132,7 +137,10 @@ public class UserControllerTests {
         // Act
         MvcResult mvcResult = mockMvc.perform(put(WITHDRAW_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                .content(requestBody).with(requestBuilder -> {
+                    requestBuilder.setAttribute("userId", 1);
+                    return requestBuilder;
+                }))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -153,8 +161,8 @@ public class UserControllerTests {
         Map<String, String> tokenMap = UserController.generateJWTToken(testUser);
 
         // Assert
-        assertTrue(tokenMap.containsKey("stock-market-token"));
-        String token = tokenMap.get("stock-market-token");
+        assertTrue(tokenMap.containsKey("accessToken"));
+        String token = tokenMap.get("accessToken");
 
         Claims claims = Jwts.parser().setSigningKey(Constants.API_SECRET_KEY).parseClaimsJws(token)
                 .getBody();

@@ -24,7 +24,7 @@ public class UserRepositoryTests {
 
     @BeforeEach
     void setup() {
-        user = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
+        user = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0, 1);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class UserRepositoryTests {
     public void Test_FindByEmailWhenEmailDoesNotExist() {
         // Arrange
         User anotherUser = new User("leonlow", "Password0!",
-                "emailnotthesame@test.com", 1000.0);
+                "emailnotthesame@test.com", 1000.0, 1);
         userRepository.save(user);
 
         // Act

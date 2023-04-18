@@ -41,6 +41,7 @@ public class User {
     @Column(name = "balance", nullable = false)
     private double balance;
 
+    @NonNull
     @Column(name = "is_active", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int isActive;

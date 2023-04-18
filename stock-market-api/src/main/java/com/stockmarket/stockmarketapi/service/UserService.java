@@ -1,14 +1,16 @@
 package com.stockmarket.stockmarketapi.service;
 
+import com.stockmarket.stockmarketapi.DTOs.UserAmountDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
+import com.stockmarket.stockmarketapi.DTOs.UserRegisterDTO;
 import com.stockmarket.stockmarketapi.entity.User;
 
 public interface UserService {
 
   User validateUser(UserLoginDTO userLoginDTO);
 
-  User registerUser(User user);
+  UserRegisterDTO registerUser(UserRegisterDTO userRegisterDTO);
 
-  void updateUserBalance(Integer userId, User user);
+  UserAmountDTO updateUserBalance(int userId, UserAmountDTO userAmount);
 
 }

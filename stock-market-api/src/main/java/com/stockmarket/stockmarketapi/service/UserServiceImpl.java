@@ -6,7 +6,9 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.stockmarket.stockmarketapi.DTOs.UserAmountDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
+import com.stockmarket.stockmarketapi.DTOs.UserRegisterDTO;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.exception.AuthException;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
@@ -22,41 +24,43 @@ public class UserServiceImpl implements UserService {
   UserRepository userRepository;
 
   @Override
-  public User registerUser(User user) {
+  public UserRegisterDTO registerUser(UserRegisterDTO userRegisterDTO) {
     try {
       // Ensure email and password are filled
-      if (user.getEmail().isBlank() || user.getPassword().isBlank()
-          || user.getUsername().isBlank()) {
+      if (userRegisterDTO.getEmail().isBlank() || userRegisterDTO.getPassword().isBlank()
+          || userRegisterDTO.getUsername().isBlank()) {
         throw new BadRequestException("Fill in all fields.");
       }
 
       // Check Length of username, password and email
-      if (user.getUsername().length() < 7 || user.getUsername().length() > 20)
+      if (userRegisterDTO.getUsername().length() < 7 || userRegisterDTO.getUsername().length() > 20)
         throw new BadRequestException("Username length must be between 7 - 20 characters.");
-      if (user.getPassword().length() < 10 || user.getPassword().length() > 20)
+      if (userRegisterDTO.getPassword().length() < 10
+          || userRegisterDTO.getPassword().length() > 20)
         throw new BadRequestException("Password length must be between 10 - 20 characters.");
-      if (user.getEmail().length() > 255)
+      if (userRegisterDTO.getEmail().length() > 255)
         throw new BadRequestException("Email Address cannot be more than 255 characters.");
 
-      user.setEmail(user.getEmail().toLowerCase());
-      if (!emailFormatCheck(user.getEmail()))
+      userRegisterDTO.setEmail(userRegisterDTO.getEmail().toLowerCase());
+      if (!emailFormatCheck(userRegisterDTO.getEmail()))
         throw new BadRequestException("Invalid email format.");
 
-      if (!passwordFormatCheck(user.getPassword()))
+      if (!passwordFormatCheck(userRegisterDTO.getPassword()))
         throw new BadRequestException(
             "Invalid password format. Password must contain at least one lowercase and uppercase character, number, and special character.");
 
-      Integer emailCount = userRepository.getCountByEmail(user.getEmail());
+      Integer emailCount = userRepository.getCountByEmail(userRegisterDTO.getEmail());
       if (emailCount >= 1)
         throw new ResourceAlreadyExistsException("Email already in use.");
 
-      user.setIsActive(1);
-      user.setBalance(1000.0);
+      User insertUser = new User(userRegisterDTO.getUsername(), userRegisterDTO.getPassword(),
+          userRegisterDTO.getEmail(), 1000.0, 1);
 
       BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-      user.setPassword(passwordEncoder.encode(user.getPassword()));
+      insertUser.setPassword(passwordEncoder.encode(insertUser.getPassword()));
+      userRepository.save(insertUser);
 
-      return userRepository.save(user);
+      return userRegisterDTO;
     } catch (NullPointerException e) {
       throw new BadRequestException(e.getMessage());
     }
@@ -93,11 +97,11 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void updateUserBalance(Integer userId, User user) {
+  public UserAmountDTO updateUserBalance(int userId, UserAmountDTO userAmountDTO) {
     Optional<User> dbUser = userRepository.findById(Long.valueOf(userId));
-    Double dbBalance = dbUser.map(u -> u.getBalance())
+    double dbBalance = dbUser.map(u -> u.getBalance())
         .orElseThrow(() -> new ResourceNotFoundException("User not found."));
-    Double updatedBalance = dbBalance + user.getBalance();
+    double updatedBalance = dbBalance + userAmountDTO.getAmount();
 
     // Prevent user from withdrawing beyond $0
     if (updatedBalance < 0.0) {
@@ -108,6 +112,9 @@ public class UserServiceImpl implements UserService {
     updatedUser.setBalance(updatedBalance);
 
     userRepository.save(updatedUser);
+    userAmountDTO.setBalance(updatedBalance);
+
+    return userAmountDTO;
   }
 
   private Boolean emailFormatCheck(String email) {

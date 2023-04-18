@@ -61,7 +61,7 @@ public class OrderServiceTests {
                 new Order(1L, "TSLA", "BUY", 10, 133.4),
                 new Order(1L, "AAPL", "SELL", 50, 163.1));
         order = new Order(1L, "JPM", "BUY", 120, 128.7);
-        user = new User("leonlow", "Password0!", "leonlow@service,com", 1000.0);
+        user = new User("leonlow", "Password0!", "leonlow@service,com", 1000.0, 1);
         portfolio = new Portfolio(1L, "Google", "GOOGL", 20, 122.17, 108.23, 0.0, 0.0);
     }
 
@@ -272,7 +272,7 @@ public class OrderServiceTests {
         // Arrange
         Portfolio dbPortfolio = new Portfolio(1L, "Google", "GOOGL", 20, 122.17, 108.23, 0.0, 0.0);
         Order invalidOrder = new Order(1L, "GOOGL", "SELL", 20, 100.0);
-        User dbUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
+        User dbUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0, 1);
         when(portfolioRepository.findByUserIdAndStockTicker(1L, "GOOGL")).thenReturn(dbPortfolio);
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -289,7 +289,7 @@ public class OrderServiceTests {
     public void Test_SubmitOrderWhenBalanceIsInsufficient() {
         // Arrange
         Order invalidOrder = new Order(1L, "BABA", "BUY", 20, 100.0);
-        User dbUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
+        User dbUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0, 1);
         when(userRepository.findById(1L)).thenReturn(Optional.of(dbUser));
 
         // Act

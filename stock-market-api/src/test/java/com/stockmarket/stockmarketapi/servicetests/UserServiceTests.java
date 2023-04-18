@@ -3,6 +3,7 @@ package com.stockmarket.stockmarketapi.servicetests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -17,7 +18,9 @@ import java.util.Optional;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.stockmarket.stockmarketapi.DTOs.UserAmountDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
+import com.stockmarket.stockmarketapi.DTOs.UserRegisterDTO;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.exception.AuthException;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
@@ -39,41 +42,41 @@ public class UserServiceTests {
 
     @BeforeEach
     void setup() throws Exception {
-        testUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
+        testUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0, 1);
         registeredUser =
                 new User("leonlow", "$2a$10$XLR4UYICkiS.rJE6S.7Lhuy92zcRFrqb8wvrvhfNDAHoowiSzWUXu",
-                        "leonlow@service.com", 1000.0);
+                        "leonlow@service.com", 1000.0, 1);
         registeredUser.setIsActive(1);
     }
 
     @Test
     public void Test_RegisterUserThenReturnUserObject() {
         // Arrange
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        when(userRepository.save(testUser)).thenReturn(testUser);
-        when(userRepository.getCountByEmail(testUser.getEmail())).thenReturn(0);
+        UserRegisterDTO userRegisterDTO =
+                new UserRegisterDTO("leonlow", "leonlow@service.com", "Password0!");
+        when(userRepository.getCountByEmail(userRegisterDTO.getEmail())).thenReturn(0);
+        when(userRepository.save(ArgumentMatchers.any(User.class))).thenReturn(registeredUser);
 
         // Act
-        registeredUser = userServiceImpl.registerUser(testUser);
+        UserRegisterDTO returnedUser = userServiceImpl.registerUser(userRegisterDTO);
 
         // Assert
-        assertEquals("leonlow", registeredUser.getUsername());
-        assertTrue(passwordEncoder.matches("Password0!", registeredUser.getPassword()));
-        assertEquals("leonlow@service.com", registeredUser.getEmail());
-        assertEquals(1000.0, registeredUser.getBalance());
+        assertEquals("leonlow", returnedUser.getUsername());
+        assertEquals("Password0!", returnedUser.getPassword());
+        assertEquals("leonlow@service.com", returnedUser.getEmail());
 
-        verify(userRepository, times(1)).save(testUser);
+        verify(userRepository, times(1)).save(ArgumentMatchers.any(User.class));
         verify(userRepository, times(1)).getCountByEmail(testUser.getEmail());
     }
 
     @Test
     public void Test_RegisterUserWhenEmailPasswordOrUsernameIsBlank() {
         // Arrange
-        User blankUser = new User("", "", "", 0.0);
+        UserRegisterDTO userRegisterDTO = new UserRegisterDTO("", "", "");
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.registerUser(blankUser);
+            userServiceImpl.registerUser(userRegisterDTO);
         });
 
         // Assert
@@ -83,11 +86,12 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenUsernameLengthIsInvalid() {
         // Arrange
-        User invalidUsername = new User("a", "Password0!", "leonlow@service.com", 1000.0);
+        UserRegisterDTO userRegisterDTO =
+                new UserRegisterDTO("a", "leonlow@service.com", "Password0!");
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.registerUser(invalidUsername);
+            userServiceImpl.registerUser(userRegisterDTO);
         });
 
         // Assert
@@ -97,11 +101,12 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenPasswordLengthIsInvalid() {
         // Arrange
-        User invalidPassword = new User("leonlow", "Pass", "leonlow@service.com", 1000.0);
+        UserRegisterDTO userRegisterDTO =
+                new UserRegisterDTO("leonlow", "leonlow@service.com", "Pass");
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.registerUser(invalidPassword);
+            userServiceImpl.registerUser(userRegisterDTO);
         });
 
         // Assert
@@ -111,11 +116,12 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenEmailLengthIsInvalid() {
         // Arrange
-        User invalidEmail = new User("leonlow", "Password0!", "test@test.com".repeat(256), 1000.0);
+        UserRegisterDTO userRegisterDTO =
+                new UserRegisterDTO("leonlow", "test@test.com".repeat(256), "Password0!");
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.registerUser(invalidEmail);
+            userServiceImpl.registerUser(userRegisterDTO);
         });
 
         // Assert
@@ -125,11 +131,12 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenPasswordFormatIsInvalid() {
         // Arrange
-        User invalidPassword = new User("leonlow", "Password", "leonlow", 1000.0);
+        UserRegisterDTO userRegisterDTO =
+                new UserRegisterDTO("leonlow", "leonlow@email.com".repeat(256), "Password");
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.registerUser(invalidPassword);
+            userServiceImpl.registerUser(userRegisterDTO);
         });
 
         // Assert
@@ -139,11 +146,11 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenEmailFormatIsInvalid() {
         // Arrange
-        User invalidEmail = new User("leonlow", "Password0!", "leonlow", 1000.0);
+        UserRegisterDTO userRegisterDTO = new UserRegisterDTO("leonlow", "leon", "Password0!");
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.registerUser(invalidEmail);
+            userServiceImpl.registerUser(userRegisterDTO);
         });
 
         // Assert
@@ -153,12 +160,14 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenEmailIsAlreadyInUse() {
         // Arrange
-        User takenEmail = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0);
+        User takenEmail = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0, 1);
+        UserRegisterDTO userRegisterDTO =
+                new UserRegisterDTO("leonlow", "leonlow@email.com", "Password0!");
         when(userRepository.getCountByEmail(takenEmail.getEmail())).thenReturn(1);
 
         // Act
         Throwable exception = assertThrows(ResourceAlreadyExistsException.class, () -> {
-            userServiceImpl.registerUser(takenEmail);
+            userServiceImpl.registerUser(userRegisterDTO);
         });
 
         // Assert
@@ -169,7 +178,7 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserNullPointerException() {
         // Arrange
-        User user = null;
+        UserRegisterDTO user = null;
 
         // Act and Assert
         assertThrows(BadRequestException.class, () -> userServiceImpl.registerUser(user));
@@ -180,7 +189,7 @@ public class UserServiceTests {
         // Arrange
         UserLoginDTO userLoginDTO = new UserLoginDTO("leonlow@service.com", "Password0!");
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        User validUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
+        User validUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0, 1);
         validUser.setIsActive(1);
         when(userRepository.findByEmail(validUser.getEmail())).thenReturn(registeredUser);
 
@@ -198,7 +207,7 @@ public class UserServiceTests {
     public void Test_ValidateUserWhenUserConstructorArgsIsIncorrect() {
         // Arrange
         UserLoginDTO userLoginDTO = new UserLoginDTO("Leon Low", "Password0!");
-        User invalidUser = new User("leonlow@example.com", "Password0!", "Leon Low", 1000.0);
+        User invalidUser = new User("leonlow@example.com", "Password0!", "Leon Low", 1000.0, 1);
         when(userRepository.findByEmail(invalidUser.getEmail())).thenReturn(invalidUser);
 
         // Act
@@ -241,7 +250,8 @@ public class UserServiceTests {
     @Test
     public void Test_ValidateUserWhenInvalidPasswordLength() {
         // Arrange
-        UserLoginDTO userLoginDTO = new UserLoginDTO("leonlow@email.com", "Password19438534345345!!!!@#234");
+        UserLoginDTO userLoginDTO =
+                new UserLoginDTO("leonlow@email.com", "Password19438534345345!!!!@#234");
 
         // Act
         Throwable exception = assertThrows(AuthException.class, () -> {
@@ -270,10 +280,10 @@ public class UserServiceTests {
     public void Test_ValidateUserWhenUserIsInactive() {
         // Arrange
         UserLoginDTO userLoginDTO = new UserLoginDTO("leonlow@service.com", "Password0!");
-        User inactiveUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
+        User inactiveUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0, 1);
         User inactiveDbUser =
                 new User("leonlow", "$2a$10$XLR4UYICkiS.rJE6S.7Lhuy92zcRFrqb8wvrvhfNDAHoowiSzWUXu",
-                        "leonlow@service.com", 1000.0);
+                        "leonlow@service.com", 1000.0, 1);
         inactiveDbUser.setIsActive(0);
         when(userRepository.findByEmail(inactiveUser.getEmail())).thenReturn(inactiveDbUser);
 
@@ -299,12 +309,13 @@ public class UserServiceTests {
     @Test
     public void Test_UpdateUserBalanceWhenUserIsValid() {
         // Arrange
-        User user = new User("leonlow", "Password0!", "leonlow@service.com", 1500.0);
+        UserAmountDTO userAmount = new UserAmountDTO();
+        userAmount.setAmount(1500.0);
         when(userRepository.findById(1L)).thenReturn(Optional.of(registeredUser));
         when(userRepository.save(registeredUser)).thenReturn(registeredUser);
 
         // Act
-        userServiceImpl.updateUserBalance(1, user);
+        userServiceImpl.updateUserBalance(1, userAmount);
 
         // Assert
         assertEquals(registeredUser.getBalance(), 2500.0);
@@ -315,12 +326,13 @@ public class UserServiceTests {
     @Test
     public void Test_UpdateUserBalanceWithInsufficientBalance() {
         // Arrange
-        User user = new User("leonlow", "Password0!", "leonlow@service.com", -3000.0);
+        UserAmountDTO userAmount = new UserAmountDTO();
+        userAmount.setAmount(-3000.0);
         when(userRepository.findById(1L)).thenReturn(Optional.of(registeredUser));
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.updateUserBalance(1, user);
+            userServiceImpl.updateUserBalance(1, userAmount);
         });
 
         assertEquals("Balance is insufficient for the specified withdrawal amount.",

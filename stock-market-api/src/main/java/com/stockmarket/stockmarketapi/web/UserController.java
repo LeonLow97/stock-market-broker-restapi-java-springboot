@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.stockmarket.stockmarketapi.Constants;
+import com.stockmarket.stockmarketapi.DTOs.UserAmountDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
+import com.stockmarket.stockmarketapi.DTOs.UserRegisterDTO;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import io.jsonwebtoken.Jwts;
@@ -20,43 +22,42 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "User Controller", description = "To sign up for an account and log in with the provided login credentials. Provides endpoint for withdrawing and depositing cash into the created account.")
+@Tag(name = "User Controller",
+                description = "To sign up for an account and log in with the provided login credentials. Provides endpoint for withdrawing and depositing cash into the created account.")
 public class UserController {
 
         @Autowired
         UserService userService;
 
         @PostMapping("/register")
-        public ResponseEntity<User> registerUser(@RequestBody User user) {
-                userService.registerUser(user);
-                return new ResponseEntity<>(user, HttpStatus.CREATED);
+        public ResponseEntity<UserRegisterDTO> registerUser(
+                        @RequestBody UserRegisterDTO userRegisterDTO) {
+                userService.registerUser(userRegisterDTO);
+                return new ResponseEntity<>(userRegisterDTO, HttpStatus.CREATED);
         }
 
         @PostMapping("/login")
-        public ResponseEntity<Map<String, String>> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
+        public ResponseEntity<Map<String, String>> loginUser(
+                        @RequestBody UserLoginDTO userLoginDTO) {
                 User user = userService.validateUser(userLoginDTO);
                 return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
         }
 
         @PutMapping("/api/deposit")
-        public ResponseEntity<Map<String, Boolean>> depositUserBalance(HttpServletRequest request,
-                        @RequestBody User user) {
+        public ResponseEntity<UserAmountDTO> depositUserBalance(HttpServletRequest request,
+                        @RequestBody UserAmountDTO userAmountDTO) {
                 Integer userId = (Integer) request.getAttribute("userId");
-                userService.updateUserBalance(userId, user);
-                Map<String, Boolean> map = new HashMap<>();
-                map.put("success", true);
-                return new ResponseEntity<>(map, HttpStatus.OK);
+                userAmountDTO = userService.updateUserBalance(userId, userAmountDTO);
+                return new ResponseEntity<>(userAmountDTO, HttpStatus.OK);
         }
 
         @PutMapping("/api/withdraw")
-        public ResponseEntity<Map<String, Boolean>> withdrawUserBalance(HttpServletRequest request,
-                        @RequestBody User user) {
+        public ResponseEntity<UserAmountDTO> withdrawUserBalance(HttpServletRequest request,
+                        @RequestBody UserAmountDTO userAmountDTO) {
                 Integer userId = (Integer) request.getAttribute("userId");
-                user.setBalance(-1.0 * user.getBalance());
-                userService.updateUserBalance(userId, user);
-                Map<String, Boolean> map = new HashMap<>();
-                map.put("success", true);
-                return new ResponseEntity<>(map, HttpStatus.OK);
+                userAmountDTO.setAmount(-1.0 * userAmountDTO.getAmount());
+                userAmountDTO = userService.updateUserBalance(userId, userAmountDTO);
+                return new ResponseEntity<>(userAmountDTO, HttpStatus.OK);
         }
 
         public static Map<String, String> generateJWTToken(User user) {
@@ -68,7 +69,7 @@ public class UserController {
                                 .claim("userId", user.getUserId()).claim("email", user.getEmail())
                                 .compact();
                 Map<String, String> map = new HashMap<>();
-                map.put("stock-market-token", token);
+                map.put("accessToken", token);
                 return map;
         }
 
