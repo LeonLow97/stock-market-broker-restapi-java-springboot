@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stockmarket.stockmarketapi.Constants;
+import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import com.stockmarket.stockmarketapi.web.UserController;
@@ -79,7 +80,7 @@ public class UserControllerTests {
     @Test
     public void Test_LoginShouldReturn200OK() throws Exception {
         // Arrange
-        when(userService.validateUser(any(User.class))).thenReturn(testUser);
+        when(userService.validateUser(any(UserLoginDTO.class))).thenReturn(testUser);
         String requestBody = objectMapper.writeValueAsString(testUser);
 
         // Act

@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
+import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.exception.AuthException;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
@@ -40,8 +40,9 @@ public class UserServiceTests {
     @BeforeEach
     void setup() throws Exception {
         testUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
-        registeredUser = new User("leonlow", "$2a$10$XLR4UYICkiS.rJE6S.7Lhuy92zcRFrqb8wvrvhfNDAHoowiSzWUXu",
-                "leonlow@service.com", 1000.0);
+        registeredUser =
+                new User("leonlow", "$2a$10$XLR4UYICkiS.rJE6S.7Lhuy92zcRFrqb8wvrvhfNDAHoowiSzWUXu",
+                        "leonlow@service.com", 1000.0);
         registeredUser.setIsActive(1);
     }
 
@@ -110,9 +111,7 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenEmailLengthIsInvalid() {
         // Arrange
-        User invalidEmail = new User("leonlow", "Password0!",
-                "test@test.com".repeat(256),
-                1000.0);
+        User invalidEmail = new User("leonlow", "Password0!", "test@test.com".repeat(256), 1000.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -126,9 +125,7 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenPasswordFormatIsInvalid() {
         // Arrange
-        User invalidPassword = new User("leonlow", "Password",
-                "leonlow",
-                1000.0);
+        User invalidPassword = new User("leonlow", "Password", "leonlow", 1000.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -142,9 +139,7 @@ public class UserServiceTests {
     @Test
     public void Test_RegisterUserWhenEmailFormatIsInvalid() {
         // Arrange
-        User invalidEmail = new User("leonlow", "Password0!",
-                "leonlow",
-                1000.0);
+        User invalidEmail = new User("leonlow", "Password0!", "leonlow", 1000.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -183,13 +178,14 @@ public class UserServiceTests {
     @Test
     public void Test_ValidateUserWhenUserIsValid() {
         // Arrange
+        UserLoginDTO userLoginDTO = new UserLoginDTO("leonlow@service.com", "Password0!");
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         User validUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
         validUser.setIsActive(1);
         when(userRepository.findByEmail(validUser.getEmail())).thenReturn(registeredUser);
 
         // Act
-        User dbUser = userServiceImpl.validateUser(validUser);
+        User dbUser = userServiceImpl.validateUser(userLoginDTO);
 
         // Assert
         assertEquals(dbUser.getEmail(), validUser.getEmail());
@@ -199,14 +195,15 @@ public class UserServiceTests {
     }
 
     @Test
-    public void Test_ValidateUserWhenUserIsInvalid() {
+    public void Test_ValidateUserWhenUserConstructorArgsIsIncorrect() {
         // Arrange
-        User invalidUser = new User("leonlow@example.com", "Password55#!@", "Leon Low", 1000.0);
+        UserLoginDTO userLoginDTO = new UserLoginDTO("Leon Low", "Password0!");
+        User invalidUser = new User("leonlow@example.com", "Password0!", "Leon Low", 1000.0);
         when(userRepository.findByEmail(invalidUser.getEmail())).thenReturn(invalidUser);
 
         // Act
         Throwable exception = assertThrows(AuthException.class, () -> {
-            userServiceImpl.validateUser(invalidUser);
+            userServiceImpl.validateUser(userLoginDTO);
         });
 
         // Assert
@@ -216,11 +213,11 @@ public class UserServiceTests {
     @Test
     public void Test_ValidateUserWhenEmailIsBlank() {
         // Arrange
-        User blankEmail = new User("leonlow", "Password0!", "", 1000.0);
+        UserLoginDTO userLoginDTO = new UserLoginDTO("", "Password0!");
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.validateUser(blankEmail);
+            userServiceImpl.validateUser(userLoginDTO);
         });
 
         // Assert
@@ -230,11 +227,11 @@ public class UserServiceTests {
     @Test
     public void Test_ValidateUserWhenPasswordIsBlank() {
         // Arrange
-        User blankPassword = new User("leonlow", "", "leonlow@email.com", 1000.0);
+        UserLoginDTO userLoginDTO = new UserLoginDTO("leonlow@email.com", "");
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
-            userServiceImpl.validateUser(blankPassword);
+            userServiceImpl.validateUser(userLoginDTO);
         });
 
         // Assert
@@ -244,11 +241,11 @@ public class UserServiceTests {
     @Test
     public void Test_ValidateUserWhenInvalidPasswordLength() {
         // Arrange
-        User invalidPassword = new User("leonlow", "Password19438534345345!!!!@#234", "leonlow@email.com", 1000.0);
+        UserLoginDTO userLoginDTO = new UserLoginDTO("leonlow@email.com", "Password19438534345345!!!!@#234");
 
         // Act
         Throwable exception = assertThrows(AuthException.class, () -> {
-            userServiceImpl.validateUser(invalidPassword);
+            userServiceImpl.validateUser(userLoginDTO);
         });
 
         // Assert
@@ -258,11 +255,11 @@ public class UserServiceTests {
     @Test
     public void Test_ValidateUserWhenInvalidEmailLength() {
         // Arrange
-        User invalidEmail = new User("leonlow", "Password0!", "test@test.com".repeat(256), 1000.0);
+        UserLoginDTO userLoginDTO = new UserLoginDTO("test@test.com", "Password0!");
 
         // Act
         Throwable exception = assertThrows(AuthException.class, () -> {
-            userServiceImpl.validateUser(invalidEmail);
+            userServiceImpl.validateUser(userLoginDTO);
         });
 
         // Assert
@@ -272,15 +269,18 @@ public class UserServiceTests {
     @Test
     public void Test_ValidateUserWhenUserIsInactive() {
         // Arrange
+        UserLoginDTO userLoginDTO = new UserLoginDTO("leonlow@service.com", "Password0!");
         User inactiveUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0);
-        User inactiveDbUser = new User("leonlow", "$2a$10$XLR4UYICkiS.rJE6S.7Lhuy92zcRFrqb8wvrvhfNDAHoowiSzWUXu",
-        "leonlow@service.com", 1000.0);
+        User inactiveDbUser =
+                new User("leonlow", "$2a$10$XLR4UYICkiS.rJE6S.7Lhuy92zcRFrqb8wvrvhfNDAHoowiSzWUXu",
+                        "leonlow@service.com", 1000.0);
         inactiveDbUser.setIsActive(0);
         when(userRepository.findByEmail(inactiveUser.getEmail())).thenReturn(inactiveDbUser);
 
+
         // Act
         Throwable exception = assertThrows(AuthException.class, () -> {
-            userServiceImpl.validateUser(inactiveUser);
+            userServiceImpl.validateUser(userLoginDTO);
         });
 
         // Assert
@@ -290,10 +290,10 @@ public class UserServiceTests {
     @Test
     public void Test_ValidateUserNullPointerException() {
         // Arrange
-        User user = null;
+        UserLoginDTO userLoginDuo = null;
 
         // Act and Assert
-        assertThrows(AuthException.class, () -> userServiceImpl.validateUser(user));
+        assertThrows(AuthException.class, () -> userServiceImpl.validateUser(userLoginDuo));
     }
 
     @Test
@@ -323,6 +323,7 @@ public class UserServiceTests {
             userServiceImpl.updateUserBalance(1, user);
         });
 
-        assertEquals("Balance is insufficient for the specified withdrawal amount.", exception.getMessage());
+        assertEquals("Balance is insufficient for the specified withdrawal amount.",
+                exception.getMessage());
     }
 }

@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.exception.AuthException;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
@@ -24,8 +25,7 @@ public class UserServiceImpl implements UserService {
   public User registerUser(User user) {
     try {
       // Ensure email and password are filled
-      if (user.getEmail().isBlank()
-          || user.getPassword().isBlank()
+      if (user.getEmail().isBlank() || user.getPassword().isBlank()
           || user.getUsername().isBlank()) {
         throw new BadRequestException("Fill in all fields.");
       }
@@ -63,21 +63,21 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User validateUser(User user) {
+  public User validateUser(UserLoginDTO userLoginDTO) {
     try {
-      if (user.getEmail() == null || user.getEmail().isBlank() || user.getPassword() == null
-          || user.getPassword().isBlank()) {
+      if (userLoginDTO.getEmail() == null || userLoginDTO.getEmail().isBlank()
+          || userLoginDTO.getPassword() == null || userLoginDTO.getPassword().isBlank()) {
         throw new BadRequestException("Fill in all fields.");
       }
-      if (user.getPassword().length() < 10 || user.getPassword().length() > 20
-          || user.getEmail().length() > 255) {
+      if (userLoginDTO.getPassword().length() < 10 || userLoginDTO.getPassword().length() > 20
+          || userLoginDTO.getEmail().length() > 255) {
         throw new AuthException("Incorrect email/password. Please try again.");
       }
 
       // Validate User
-      User dbUser = userRepository.findByEmail(user.getEmail());
+      User dbUser = userRepository.findByEmail(userLoginDTO.getEmail());
       BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-      if (!passwordEncoder.matches(user.getPassword(), dbUser.getPassword())) {
+      if (!passwordEncoder.matches(userLoginDTO.getPassword(), dbUser.getPassword())) {
         throw new AuthException("Incorrect email/password. Please try again.");
       }
 
