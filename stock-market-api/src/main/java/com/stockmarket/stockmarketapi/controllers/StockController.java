@@ -1,4 +1,4 @@
-package com.stockmarket.stockmarketapi.web;
+package com.stockmarket.stockmarketapi.controllers;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;

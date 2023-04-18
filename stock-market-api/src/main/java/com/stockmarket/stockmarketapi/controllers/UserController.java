@@ -1,4 +1,4 @@
-package com.stockmarket.stockmarketapi.web;
+package com.stockmarket.stockmarketapi.controllers;
 
 import java.util.Date;
 import java.util.HashMap;

@@ -4,16 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import com.stockmarket.stockmarketapi.controllers.OrderController;
+import com.stockmarket.stockmarketapi.controllers.PortfolioController;
+import com.stockmarket.stockmarketapi.controllers.StockController;
+import com.stockmarket.stockmarketapi.controllers.UserController;
+import com.stockmarket.stockmarketapi.controllers.WatchlistController;
 import com.stockmarket.stockmarketapi.service.OrderService;
 import com.stockmarket.stockmarketapi.service.PortfolioService;
 import com.stockmarket.stockmarketapi.service.StockService;
 import com.stockmarket.stockmarketapi.service.UserService;
 import com.stockmarket.stockmarketapi.service.WatchlistService;
-import com.stockmarket.stockmarketapi.web.OrderController;
-import com.stockmarket.stockmarketapi.web.PortfolioController;
-import com.stockmarket.stockmarketapi.web.StockController;
-import com.stockmarket.stockmarketapi.web.UserController;
-import com.stockmarket.stockmarketapi.web.WatchlistController;
 
 @SpringBootTest
 class StockMarketApiApplicationTests {

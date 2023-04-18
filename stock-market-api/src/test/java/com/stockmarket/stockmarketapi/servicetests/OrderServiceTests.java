@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import com.stockmarket.stockmarketapi.DTOs.OrderSubmitDTO;
 import com.stockmarket.stockmarketapi.entity.Order;
 import com.stockmarket.stockmarketapi.entity.Portfolio;
 import com.stockmarket.stockmarketapi.entity.User;
@@ -140,7 +140,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenStockTickerIsBlank() {
         // Arrange
-        Order blankStockTickerOrder = new Order(1L, "", "BUY", 10, 0.0);
+        OrderSubmitDTO blankStockTickerOrder = new OrderSubmitDTO("", "BUY", 10, 0.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -154,7 +154,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenOrderTypeIsBlank() {
         // Arrange
-        Order blankOrderType = new Order(1L, "GOOGL", "", 10, 0.0);
+        OrderSubmitDTO blankOrderType = new OrderSubmitDTO("GOOGL", "", 10, 0.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -168,8 +168,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenInvalidStockTickerLength() {
         // Arrange
-        Order invalidOrder = new Order(1L, "thisstocktickerhasalengthmorethan20characterswhichisinvalid", "BUY", 10,
-                0.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("thisstocktickerhasalengthmorethan20characters", "BUY", 10, 0.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -183,7 +182,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenInvalidOrderTypeLength() {
         // Arrange
-        Order invalidOrder = new Order(1L, "GOOGLE", "BUYSELL", 10, 0.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("GOOGL", "BUYSELL", 10, 0.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -197,7 +196,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenInvalidOrderType() {
         // Arrange
-        Order invalidOrder = new Order(1L, "GOOGLE", "BUYS", 10, 0.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("GOOGL", "BUYS", 10, 0.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -211,7 +210,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenNoOfSharesNegative() {
         // Arrange
-        Order invalidOrder = new Order(1L, "GOOGLE", "BUY", -10, 0.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("GOOGL", "BUY", -10, 0.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -225,7 +224,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenCostNegative() {
         // Arrange
-        Order invalidOrder = new Order(1L, "GOOGLE", "BUY", 10, -100.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("GOOGL", "BUY", 10, -100.0);
 
         // Act
         Throwable exception = assertThrows(BadRequestException.class, () -> {
@@ -239,7 +238,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenStockNotFoundInPortfolio() {
         // Arrange
-        Order invalidOrder = new Order(1L, "GOOGL", "SELL", 10, 100.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("GOOGL", "SELL", 10, 0.0);
         when(portfolioRepository.findByUserIdAndStockTicker(1L, "GOOGL")).thenReturn(null);
 
         // Act
@@ -255,7 +254,7 @@ public class OrderServiceTests {
     public void Test_SubmitOrderWhenToSellInvalidNoOfShares() {
         // Arrange
         Portfolio dbPortfolio = new Portfolio(1L, "Google", "GOOGL", 20, 122.17, 108.23, 0.0, 0.0);
-        Order invalidOrder = new Order(1L, "GOOGL", "SELL", 21, 100.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("GOOGL", "SELL", 21, 0.0);
         when(portfolioRepository.findByUserIdAndStockTicker(1L, "GOOGL")).thenReturn(dbPortfolio);
 
         // Act
@@ -271,7 +270,7 @@ public class OrderServiceTests {
     public void Test_SubmitOrderWhenUserNotFoundById() {
         // Arrange
         Portfolio dbPortfolio = new Portfolio(1L, "Google", "GOOGL", 20, 122.17, 108.23, 0.0, 0.0);
-        Order invalidOrder = new Order(1L, "GOOGL", "SELL", 20, 100.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("GOOGL", "SELL", 20, 100.0);
         User dbUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0, 1);
         when(portfolioRepository.findByUserIdAndStockTicker(1L, "GOOGL")).thenReturn(dbPortfolio);
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
@@ -288,7 +287,7 @@ public class OrderServiceTests {
     @Test
     public void Test_SubmitOrderWhenBalanceIsInsufficient() {
         // Arrange
-        Order invalidOrder = new Order(1L, "BABA", "BUY", 20, 100.0);
+        OrderSubmitDTO invalidOrder = new OrderSubmitDTO("BABA", "BUY", 20, 100.0);
         User dbUser = new User("leonlow", "Password0!", "leonlow@service.com", 1000.0, 1);
         when(userRepository.findById(1L)).thenReturn(Optional.of(dbUser));
 

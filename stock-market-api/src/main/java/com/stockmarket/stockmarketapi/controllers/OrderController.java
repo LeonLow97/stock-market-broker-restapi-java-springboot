@@ -1,4 +1,4 @@
-package com.stockmarket.stockmarketapi.web;
+package com.stockmarket.stockmarketapi.controllers;
 
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.stockmarket.stockmarketapi.DTOs.OrderSubmitDTO;
 import com.stockmarket.stockmarketapi.entity.Order;
 import com.stockmarket.stockmarketapi.service.OrderService;
 
@@ -34,9 +35,9 @@ public class OrderController {
   }
 
   @PostMapping("/orders")
-  public ResponseEntity<Order> submitOrder(HttpServletRequest request, @RequestBody Order order) {
+  public ResponseEntity<Order> submitOrder(HttpServletRequest request, @RequestBody OrderSubmitDTO orderSubmitDTO) {
     Integer userId = (Integer) request.getAttribute("userId");
-    orderService.submitOrder(userId, order);
+    Order order = orderService.submitOrder(userId, orderSubmitDTO);
     return new ResponseEntity<>(order, HttpStatus.CREATED);
   }
   

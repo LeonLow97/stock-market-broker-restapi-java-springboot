@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.stockmarket.stockmarketapi.DTOs.OrderSubmitDTO;
 import com.stockmarket.stockmarketapi.entity.Order;
 import com.stockmarket.stockmarketapi.entity.Portfolio;
 import com.stockmarket.stockmarketapi.entity.User;
@@ -56,50 +57,48 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Order submitOrder(int userId, Order order) {
-
-    order.setUserId(Long.valueOf(userId));
+  public Order submitOrder(int userId, OrderSubmitDTO orderSubmitDTO) {
 
     try {
       // Trim Fields
-      order.setOrderType(order.getOrderType().trim());
+      orderSubmitDTO.setOrderType(orderSubmitDTO.getOrderType().trim());
 
-      if (order.getStockTicker().isBlank()
-          || order.getOrderType().isBlank()) {
+      if (orderSubmitDTO.getStockTicker().isBlank()
+          || orderSubmitDTO.getOrderType().isBlank()) {
         throw new BadRequestException("Fill in all fields.");
       }
-      if (order.getStockTicker().length() > 20) {
+      if (orderSubmitDTO.getStockTicker().length() > 20) {
         throw new BadRequestException("Stock Ticker has a maximum of 20 characters.");
       }
-      if (order.getOrderType().length() > 4) {
+      if (orderSubmitDTO.getOrderType().length() > 4) {
         throw new BadRequestException("Order Type has a maximum of 4 characters.");
       }
 
-      ORDER_TYPE type = ORDER_TYPE.valueOf(order.getOrderType().toUpperCase());
-      if (order.getNoOfShares() < 0) {
+      ORDER_TYPE type = ORDER_TYPE.valueOf(orderSubmitDTO.getOrderType().toUpperCase());
+      if (orderSubmitDTO.getNoOfShares() < 0) {
         throw new BadRequestException("Number of shares cannot be negative.");
       }
-      if (order.getCost() < 0) {
+      if (orderSubmitDTO.getCost() < 0) {
         throw new BadRequestException("Price cannot be negative.");
       }
 
       // Retrieve user's current portfolio details
       Portfolio dbPortfolio = portfolioRepository.findByUserIdAndStockTicker(Long.valueOf(userId),
-          order.getStockTicker().trim());
+      orderSubmitDTO.getStockTicker().trim());
       if (dbPortfolio == null && type == ORDER_TYPE.SELL) {
         throw new ResourceNotFoundException(
             "Unable to sell stock as it does not exist in user's portfolio.");
       }
       if (type == ORDER_TYPE.SELL) {
-        if (order.getNoOfShares() > dbPortfolio.getNoOfShares()) {
+        if (orderSubmitDTO.getNoOfShares() > dbPortfolio.getNoOfShares()) {
           throw new OrderNotFilledException("Insufficient no. of shares.");
         }
       }
 
       // Check if price is between the market's high and low within the day.
-      Stock stock = new Stock(order.getStockTicker());
+      Stock stock = new Stock(orderSubmitDTO.getStockTicker());
       StockQuote stockQuote = stock.getQuote(true);
-      BigDecimal orderPrice = new BigDecimal(order.getCost());
+      BigDecimal orderPrice = new BigDecimal(orderSubmitDTO.getCost());
 
       // Check if user's account has sufficient funds
       Optional<User> dbUser = userRepository.findById(Long.valueOf(userId));
@@ -112,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
       // Check if user has sufficient funds to purchase stocks and specified number of
       // shares &
       // price
-      Double cost = order.getCost() * order.getNoOfShares();
+      Double cost = orderSubmitDTO.getCost() * orderSubmitDTO.getNoOfShares();
       if (dbBalance < cost && type == ORDER_TYPE.BUY) {
         throw new OrderNotFilledException(
             "Balance is insufficient to cover the total cost of stocks.");
@@ -124,16 +123,16 @@ public class OrderServiceImpl implements OrderService {
           throw new OrderNotFilledException(
               "Order not filled as price is less than lowest bid price on " + LocalDateTime.now());
         } else if (type == ORDER_TYPE.SELL) {
-          order.setCost(stockQuote.getDayLow().doubleValue());
-          dbBalance = dbBalance + (order.getNoOfShares() * stockQuote.getDayLow().doubleValue());
+          orderSubmitDTO.setCost(stockQuote.getDayLow().doubleValue());
+          dbBalance = dbBalance + (orderSubmitDTO.getNoOfShares() * stockQuote.getDayLow().doubleValue());
         }
       }
 
       // Specified price is more than the intra-day high
       if (orderPrice.compareTo(stockQuote.getDayHigh()) > 0) {
         if (type == ORDER_TYPE.BUY) {
-          order.setCost(stockQuote.getDayHigh().doubleValue());
-          dbBalance = dbBalance - (order.getNoOfShares() * stockQuote.getDayHigh().doubleValue());
+          orderSubmitDTO.setCost(stockQuote.getDayHigh().doubleValue());
+          dbBalance = dbBalance - (orderSubmitDTO.getNoOfShares() * stockQuote.getDayHigh().doubleValue());
         } else if (type == ORDER_TYPE.SELL) {
           throw new OrderNotFilledException(
               "Order not filled as price is more than highest ask price on " + LocalDateTime.now());
@@ -150,6 +149,7 @@ public class OrderServiceImpl implements OrderService {
         }
       }
 
+      Order order = new Order((long) userId, orderSubmitDTO.getStockTicker(), orderSubmitDTO.getOrderType(), orderSubmitDTO.getNoOfShares(), orderSubmitDTO.getCost());
       order = orderRepository.save(order);
       User updatedUser = dbUser.get();
       updatedUser.setBalance(dbBalance);

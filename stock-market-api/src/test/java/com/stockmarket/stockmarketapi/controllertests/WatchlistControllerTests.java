@@ -21,9 +21,9 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stockmarket.stockmarketapi.controllers.WatchlistController;
 import com.stockmarket.stockmarketapi.entity.Watchlist;
 import com.stockmarket.stockmarketapi.service.WatchlistService;
-import com.stockmarket.stockmarketapi.web.WatchlistController;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
