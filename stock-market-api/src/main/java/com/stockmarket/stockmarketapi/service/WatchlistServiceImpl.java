@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.stockmarket.stockmarketapi.entity.Watchlist;
+import com.stockmarket.stockmarketapi.exception.InternalServerErrorException;
 import com.stockmarket.stockmarketapi.exception.ResourceAlreadyExistsException;
 import com.stockmarket.stockmarketapi.exception.ResourceNotFoundException;
 import com.stockmarket.stockmarketapi.repository.WatchlistRepository;
@@ -57,8 +58,8 @@ public class WatchlistServiceImpl implements WatchlistService {
       return addedWatchlist;
     } catch (IOException e) {
       System.out.println("IOException YahooFinanceAPI addWatchlist: " + e.getMessage());
+      throw new InternalServerErrorException("Internal Server Error");
     }
-    return null;
   }
 
   @Override

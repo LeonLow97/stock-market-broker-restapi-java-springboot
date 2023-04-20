@@ -53,4 +53,12 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiException, notFoundRequest);
     }
 
+    @ExceptionHandler(value = {InternalServerErrorException.class})
+    public ResponseEntity<Object> handleInternalServerErrorException(
+            InternalServerErrorException e) {
+        HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
+        ApiException apiException = new ApiException(e.getMessage(), internalServerError,
+                ZonedDateTime.now(ZoneId.of("Z")));
+        return new ResponseEntity<>(apiException, internalServerError);
+    }
 }
