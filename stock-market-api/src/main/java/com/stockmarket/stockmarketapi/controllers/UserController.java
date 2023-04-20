@@ -28,9 +28,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 
-@RestController
 @Tag(name = "User Controller",
                 description = "To sign up for an account and log in with the provided login credentials. Provides endpoint for withdrawing and depositing cash into the created account.")
+@RestController
 public class UserController {
 
         @Autowired
