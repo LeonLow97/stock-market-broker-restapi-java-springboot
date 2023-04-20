@@ -110,9 +110,7 @@ public class UserServiceImpl implements UserService {
 
     User updatedUser = dbUser.get();
     updatedUser.setBalance(updatedBalance);
-
     userRepository.save(updatedUser);
-    userAmountDTO.setBalance(updatedBalance);
 
     return userAmountDTO;
   }

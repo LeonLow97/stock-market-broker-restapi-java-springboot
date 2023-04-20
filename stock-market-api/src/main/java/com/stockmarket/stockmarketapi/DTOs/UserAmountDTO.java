@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserAmountDTO {
-    
+
     @JsonProperty(access = Access.WRITE_ONLY)
     public double amount;
 

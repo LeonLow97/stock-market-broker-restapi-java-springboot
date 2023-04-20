@@ -2,6 +2,7 @@ package com.stockmarket.stockmarketapi.controllertests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,6 +16,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stockmarket.stockmarketapi.Constants;
+import com.stockmarket.stockmarketapi.DTOs.UserAmountDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserRegisterDTO;
 import com.stockmarket.stockmarketapi.controllers.UserController;
@@ -22,6 +24,7 @@ import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,16 +63,15 @@ public class UserControllerTests {
     @Test
     public void Test_RegisterShouldReturn201Created() throws Exception {
         // Arrange
-        UserRegisterDTO userRegisterDTO = new UserRegisterDTO("leonlow", "leonlow@email.com", "Password0!");
+        UserRegisterDTO userRegisterDTO =
+                new UserRegisterDTO("leonlow", "leonlow@email.com", "Password0!");
         when(userService.registerUser(any(UserRegisterDTO.class))).thenReturn(userRegisterDTO);
         String requestBody = objectMapper.writeValueAsString(testUser);
 
         // Act
-        MvcResult mvcResult = mockMvc.perform(post(REGISTER_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody))
-            .andExpect(status().isCreated())
-            .andReturn();
+        MvcResult mvcResult = mockMvc.perform(
+                post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isCreated()).andReturn();
 
         // Assert
         int status = mvcResult.getResponse().getStatus();
@@ -103,46 +105,44 @@ public class UserControllerTests {
     @Test
     public void Test_DepositUserBalance() throws Exception {
         // Arrange
-        testUser.setBalance(3000.0);
+        UserAmountDTO userAmountDTO = new UserAmountDTO();
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
-        String requestBody = objectMapper.writeValueAsString(testUser);
+        when(userService.updateUserBalance(1, userAmountDTO)).thenReturn(userAmountDTO);
+        String requestBody = objectMapper.writeValueAsString(userAmountDTO);
 
         // Act
-        MvcResult mvcResult = mockMvc.perform(put(DEPOSIT_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody).with(requestBuilder -> {
-                    requestBuilder.setAttribute("userId", 1);
-                    return requestBuilder;
-                }))
-                .andExpect(status().isOk())
-                .andReturn();
+        MvcResult mvcResult =
+                mockMvc.perform(put(DEPOSIT_PATH).contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody).with(requestBuilder -> {
+                            requestBuilder.setAttribute("userId", 1);
+                            return requestBuilder;
+                        })).andExpect(status().isOk()).andReturn();
 
         // Assert
         int status = mvcResult.getResponse().getStatus();
         String content = mvcResult.getResponse().getContentAsString();
-        String expectedJson = "{\"success\":true}";
-        assertEquals(200, status);
+        String expectedJson = String.format("{\"balance\":%.1f}", 3000.0);
+        assertEquals(HttpStatus.OK.value(), status);
         assertEquals(expectedJson, content);
     }
+
+
 
     @Test
     public void Test_WithdrawUserBalance() throws Exception {
         // Arrange
-        testUser.setBalance(2000.0);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
         String requestBody = objectMapper.writeValueAsString(testUser);
 
         // Act
-        MvcResult mvcResult = mockMvc.perform(put(WITHDRAW_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody).with(requestBuilder -> {
-                    requestBuilder.setAttribute("userId", 1);
-                    return requestBuilder;
-                }))
-                .andExpect(status().isOk())
-                .andReturn();
+        MvcResult mvcResult =
+                mockMvc.perform(put(WITHDRAW_PATH).contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody).with(requestBuilder -> {
+                            requestBuilder.setAttribute("userId", 1);
+                            return requestBuilder;
+                        })).andExpect(status().isOk()).andReturn();
 
         // Assert
         int status = mvcResult.getResponse().getStatus();

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.stockmarket.stockmarketapi.Constants;
+import com.stockmarket.stockmarketapi.DTOs.UserAccessTokenDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserAmountDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserLoginDTO;
 import com.stockmarket.stockmarketapi.DTOs.UserRegisterDTO;
@@ -19,7 +20,13 @@ import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 
 @RestController
 @Tag(name = "User Controller",
@@ -29,21 +36,44 @@ public class UserController {
         @Autowired
         UserService userService;
 
-        @PostMapping("/register")
+        @Operation(summary = "Register user", description = "Adds the user to the database. Must have unique email and password.")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "201", description = "Sign Up was successful!",
+                                        content = @Content(schema = @Schema(
+                                                        implementation = UserRegisterDTO.class))),
+                        @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                                        content = @Content),
+                        @ApiResponse(responseCode = "409", description = "CONFLICT",
+                                        content = @Content)})
+        @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
         public ResponseEntity<UserRegisterDTO> registerUser(
                         @RequestBody UserRegisterDTO userRegisterDTO) {
                 userService.registerUser(userRegisterDTO);
                 return new ResponseEntity<>(userRegisterDTO, HttpStatus.CREATED);
         }
 
-        @PostMapping("/login")
-        public ResponseEntity<Map<String, String>> loginUser(
+        @Operation(summary = "Login user", description = "Authenticates the user. Returns JWT Token for Bearer authentication.")
+        @ApiResponses(value = {
+                @ApiResponse(responseCode = "200", description = "Successful login!", content = @Content(schema = @Schema(implementation = UserAccessTokenDTO.class))),
+                @ApiResponse(responseCode = "400", description = "BAD REQUEST", content = @Content),
+                @ApiResponse(responseCode = "401", description = "UNAUTHORIZED", content = @Content)
+        })
+        @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<UserAccessTokenDTO> loginUser(
                         @RequestBody UserLoginDTO userLoginDTO) {
                 User user = userService.validateUser(userLoginDTO);
-                return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
+                Map<String, String> accessTokenMap = generateJWTToken(user);
+                UserAccessTokenDTO accessToken =
+                                new UserAccessTokenDTO(accessTokenMap.get("accessToken"));
+                return new ResponseEntity<>(accessToken, HttpStatus.OK);
         }
 
-        @PutMapping("/api/deposit")
+        @Operation(summary = "Deposit to user account", description = "To load up funds to user's accounts to purchase stocks.")
+        @ApiResponses(value = {
+                @ApiResponse(responseCode = "200", description = "Successfully deposited amount into user's account", content = @Content(schema = @Schema(implementation = UserAmountDTO.class))),
+                @ApiResponse(responseCode = "404", description = "NOT FOUND (when user does not exist)", content = @Content)
+        })
+        @PutMapping(value = "/api/deposit", produces = MediaType.APPLICATION_JSON_VALUE)
         public ResponseEntity<UserAmountDTO> depositUserBalance(HttpServletRequest request,
                         @RequestBody UserAmountDTO userAmountDTO) {
                 Integer userId = (Integer) request.getAttribute("userId");
@@ -51,7 +81,13 @@ public class UserController {
                 return new ResponseEntity<>(userAmountDTO, HttpStatus.OK);
         }
 
-        @PutMapping("/api/withdraw")
+        @Operation(summary = "Withdraw from user account", description = "To collect profits from user's accounts.")
+        @ApiResponses(value = {
+                @ApiResponse(responseCode = "200", description = "Successfully withdrew amount from user's account", content = @Content(schema = @Schema(implementation = UserAmountDTO.class))),
+                @ApiResponse(responseCode = "404", description = "NOT FOUND (when user does not exist)", content = @Content),
+                @ApiResponse(responseCode = "400", description = "BAD REQUEST", content = @Content)
+        })
+        @PutMapping(value = "/api/withdraw", produces = MediaType.APPLICATION_JSON_VALUE)
         public ResponseEntity<UserAmountDTO> withdrawUserBalance(HttpServletRequest request,
                         @RequestBody UserAmountDTO userAmountDTO) {
                 Integer userId = (Integer) request.getAttribute("userId");
