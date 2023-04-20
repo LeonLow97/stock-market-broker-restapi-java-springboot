@@ -13,6 +13,7 @@ import com.stockmarket.stockmarketapi.entity.Order;
 import com.stockmarket.stockmarketapi.entity.Portfolio;
 import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.exception.BadRequestException;
+import com.stockmarket.stockmarketapi.exception.InternalServerErrorException;
 import com.stockmarket.stockmarketapi.exception.OrderNotFilledException;
 import com.stockmarket.stockmarketapi.exception.ResourceNotFoundException;
 import com.stockmarket.stockmarketapi.repository.OrderRepository;
@@ -191,7 +192,7 @@ public class OrderServiceImpl implements OrderService {
 
       return order;
     } catch (IOException e) {
-      throw new BadRequestException("Error connecting with Yahoo Finance API");
+      throw new InternalServerErrorException("Error connecting with Yahoo Finance API");
     } catch (NullPointerException e) {
       throw new NullPointerException("NullPointerException: " + e.getMessage());
     } catch (IllegalArgumentException e) {
