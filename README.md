@@ -61,6 +61,7 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 
 ## Swagger UI Documentation
 
+- [API Docs](http://localhost:8080/v3/api-docs)
 - [Swagger UI](http://localhost:8080/swagger-ui/index.html)
 
 ## Unit Testing

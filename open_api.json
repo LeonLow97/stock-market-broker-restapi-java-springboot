@@ -1,0 +1,690 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Java Spring Boot REST API Microservice",
+        "description": "Java Spring Boot REST API for Stock Market Brokers",
+        "contact": {
+            "name": "Low Jie Wei",
+            "url": "https://www.linkedin.com/in/lowjiewei/",
+            "email": "lowjiewei@gmail.com"
+        },
+        "version": "v1.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080"
+        }
+    ],
+    "tags": [
+        {
+            "name": "User Controller",
+            "description": "To sign up for an account and log in with the provided login credentials. Provides endpoint for withdrawing and depositing cash into the created account."
+        },
+        {
+            "name": "Stock Controller",
+            "description": "Connecting to Yahoo Finance API to retrieve real time daily stock data."
+        },
+        {
+            "name": "Order Controller",
+            "description": "To submit an order to purchase or sell a stock."
+        },
+        {
+            "name": "Watchlist Controller",
+            "description": "Allow user to save stocks into their watchlist to monitor prices or other details related to the stock."
+        },
+        {
+            "name": "Portfolio Controller",
+            "description": "To retrieve the portfolio of the user to view stocks that have been purchased."
+        }
+    ],
+    "paths": {
+        "/api/withdraw": {
+            "put": {
+                "tags": [
+                    "User Controller"
+                ],
+                "summary": "Withdraw from user account",
+                "description": "To collect profits from user's accounts.",
+                "operationId": "withdrawUserBalance",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserAmountDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "BAD REQUEST"
+                    },
+                    "200": {
+                        "description": "Successfully withdrew amount from user's account",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserAmountDTO"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "NOT FOUND (when user does not exist)"
+                    }
+                }
+            }
+        },
+        "/api/deposit": {
+            "put": {
+                "tags": [
+                    "User Controller"
+                ],
+                "summary": "Deposit to user account",
+                "description": "To load up funds to user's accounts to purchase stocks.",
+                "operationId": "depositUserBalance",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserAmountDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully deposited amount into user's account",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserAmountDTO"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "NOT FOUND (when user does not exist)"
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "tags": [
+                    "User Controller"
+                ],
+                "summary": "Register user",
+                "description": "Adds the user to the database. Must have unique email and password.",
+                "operationId": "registerUser",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserRegisterDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "409": {
+                        "description": "CONFLICT"
+                    },
+                    "201": {
+                        "description": "Sign Up was successful!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserRegisterDTO"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "BAD REQUEST"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "User Controller"
+                ],
+                "summary": "Login user",
+                "description": "Authenticates the user. Returns JWT Token for Bearer authentication.",
+                "operationId": "loginUser",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserLoginDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserAccessTokenDTO"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED"
+                    },
+                    "400": {
+                        "description": "BAD REQUEST"
+                    }
+                }
+            }
+        },
+        "/api/watchlist/{stockTicker}": {
+            "post": {
+                "tags": [
+                    "Watchlist Controller"
+                ],
+                "summary": "Add Watchlist",
+                "description": "Adds a stock the the watchlist of the user.",
+                "operationId": "addWatchlist",
+                "parameters": [
+                    {
+                        "name": "stockTicker",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "409": {
+                        "description": "CONFLICT - Stock is already in watchlist"
+                    },
+                    "201": {
+                        "description": "Successfully added the stock to the watchlist of the user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Watchlist"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR - Unable to connect to Yahoo Finance API"
+                    },
+                    "404": {
+                        "description": "NOT FOUND - Stock Ticker is invalid"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Watchlist Controller"
+                ],
+                "summary": "Remove Watchlist",
+                "description": "Removes a stock from the watchlist of the user.",
+                "operationId": "removeWatchlist",
+                "parameters": [
+                    {
+                        "name": "stockTicker",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successfully deleted the stock from the watchlist of the user."
+                    }
+                }
+            }
+        },
+        "/api/orders": {
+            "get": {
+                "tags": [
+                    "Order Controller"
+                ],
+                "summary": "Get All Orders",
+                "description": "Retrieves all the orders of the user.",
+                "operationId": "getAllOrders",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all the orders of the user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Order"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Order Controller"
+                ],
+                "summary": "Submit Order",
+                "description": "Submits a order to BUY or SELL a stock.",
+                "operationId": "submitOrder",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrderSubmitDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR - Unable to connect to Yahoo Finance API."
+                    },
+                    "404": {
+                        "description": "NOT FOUND - Order Not Found"
+                    },
+                    "201": {
+                        "description": "Successfully created an order when the stock is bought or sold.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderSubmitDTO"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "BAD REQUEST"
+                    }
+                }
+            }
+        },
+        "/yahoo-api/stocks/{stockTicker}": {
+            "get": {
+                "tags": [
+                    "Stock Controller"
+                ],
+                "summary": "Get stock data",
+                "description": "Retrieves the price of the stock and other fundamental details of the business.",
+                "operationId": "getStock",
+                "parameters": [
+                    {
+                        "name": "stockTicker",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved stock details from Yahoo Finance API",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StockData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/watchlist": {
+            "get": {
+                "tags": [
+                    "Watchlist Controller"
+                ],
+                "summary": "Get Watchlist",
+                "description": "Retrieves the watchlist of the user for all the stocks",
+                "operationId": "getWatchlist",
+                "responses": {
+                    "404": {
+                        "description": "NOT FOUND - Watchlist is empty"
+                    },
+                    "200": {
+                        "description": "Successfully retrieves the watchlist for all the stocks.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Watchlist"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/portfolio": {
+            "get": {
+                "tags": [
+                    "Portfolio Controller"
+                ],
+                "summary": "Get Portfolio",
+                "description": "Retrieves the entire portfolio of stocks of the user.",
+                "operationId": "getPortfolio",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved the portfolio of the user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Portfolio"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "NOT FOUND - portfolio does not exist"
+                    }
+                }
+            }
+        },
+        "/api/portfolio/{portfolioId}": {
+            "get": {
+                "tags": [
+                    "Portfolio Controller"
+                ],
+                "summary": "Get Portfolio Stock",
+                "description": "Retrieves the details of a particular stock in the portfolio of the user.",
+                "operationId": "getPortfolioStock",
+                "parameters": [
+                    {
+                        "name": "portfolioId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved the details of the stock of the user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Portfolio"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "NOT FOUND - stock does not exist in user's portfolio."
+                    }
+                }
+            }
+        },
+        "/api/orders/{orderId}": {
+            "get": {
+                "tags": [
+                    "Order Controller"
+                ],
+                "summary": "Get Order",
+                "description": "Retrieves a specific order of the user based on order id.",
+                "operationId": "getOrder",
+                "parameters": [
+                    {
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved the specified order of the user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Order"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "UserAmountDTO": {
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "type": "number",
+                        "format": "double",
+                        "writeOnly": true
+                    },
+                    "balance": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    }
+                }
+            },
+            "UserRegisterDTO": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string",
+                        "writeOnly": true
+                    }
+                }
+            },
+            "UserLoginDTO": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UserAccessTokenDTO": {
+                "type": "object",
+                "properties": {
+                    "accessToken": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Watchlist": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "stockName": {
+                        "type": "string"
+                    },
+                    "stockTicker": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "previousDayClose": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "get_52WeekHigh": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "get_52WeekLow": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "marketCapInBillions": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "annualDividendYield": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            },
+            "OrderSubmitDTO": {
+                "type": "object",
+                "properties": {
+                    "stockTicker": {
+                        "type": "string"
+                    },
+                    "orderType": {
+                        "type": "string"
+                    },
+                    "noOfShares": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "cost": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            },
+            "StockData": {
+                "type": "object",
+                "properties": {
+                    "stockName": {
+                        "type": "string"
+                    },
+                    "stockTicker": {
+                        "type": "string"
+                    },
+                    "previousDayClose": {
+                        "type": "number"
+                    },
+                    "stockPrice": {
+                        "type": "number"
+                    },
+                    "dayHigh": {
+                        "type": "number"
+                    },
+                    "dayLow": {
+                        "type": "number"
+                    },
+                    "dayChangeInPercent": {
+                        "type": "number"
+                    },
+                    "get_52WeekChangeInPercent": {
+                        "type": "number"
+                    },
+                    "get_52WeekHigh": {
+                        "type": "number"
+                    },
+                    "yearDividendInPercent": {
+                        "type": "number"
+                    }
+                }
+            },
+            "Portfolio": {
+                "type": "object",
+                "properties": {
+                    "stockName": {
+                        "type": "string"
+                    },
+                    "stockTicker": {
+                        "type": "string"
+                    },
+                    "noOfShares": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "cost": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "addedDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "writeOnly": true
+                    },
+                    "updatedDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "writeOnly": true
+                    },
+                    "pnlinPercentage": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "pnlinDollars": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            },
+            "Order": {
+                "type": "object",
+                "properties": {
+                    "orderId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "stockTicker": {
+                        "type": "string"
+                    },
+                    "orderType": {
+                        "type": "string"
+                    },
+                    "noOfShares": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "cost": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "orderDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        }
+    }
+}
