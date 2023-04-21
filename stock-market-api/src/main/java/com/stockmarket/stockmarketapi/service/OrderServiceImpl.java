@@ -50,7 +50,8 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public Order getOrder(int userId, int orderId) {
-    Order order = orderRepository.findByUserIdAndOrderId(Long.valueOf(userId), Long.valueOf(orderId));
+    Order order =
+        orderRepository.findByUserIdAndOrderId(Long.valueOf(userId), Long.valueOf(orderId));
     if (order == null) {
       throw new ResourceNotFoundException("No order was found.");
     }
@@ -59,13 +60,11 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public Order submitOrder(int userId, OrderSubmitDTO orderSubmitDTO) {
-
     try {
       // Trim Fields
       orderSubmitDTO.setOrderType(orderSubmitDTO.getOrderType().trim());
 
-      if (orderSubmitDTO.getStockTicker().isBlank()
-          || orderSubmitDTO.getOrderType().isBlank()) {
+      if (orderSubmitDTO.getStockTicker().isBlank() || orderSubmitDTO.getOrderType().isBlank()) {
         throw new BadRequestException("Fill in all fields.");
       }
       if (orderSubmitDTO.getStockTicker().length() > 20) {
@@ -85,7 +84,7 @@ public class OrderServiceImpl implements OrderService {
 
       // Retrieve user's current portfolio details
       Portfolio dbPortfolio = portfolioRepository.findByUserIdAndStockTicker(Long.valueOf(userId),
-      orderSubmitDTO.getStockTicker().trim());
+          orderSubmitDTO.getStockTicker().trim());
       if (dbPortfolio == null && type == ORDER_TYPE.SELL) {
         throw new ResourceNotFoundException(
             "Unable to sell stock as it does not exist in user's portfolio.");
@@ -125,7 +124,8 @@ public class OrderServiceImpl implements OrderService {
               "Order not filled as price is less than lowest bid price on " + LocalDateTime.now());
         } else if (type == ORDER_TYPE.SELL) {
           orderSubmitDTO.setCost(stockQuote.getDayLow().doubleValue());
-          dbBalance = dbBalance + (orderSubmitDTO.getNoOfShares() * stockQuote.getDayLow().doubleValue());
+          dbBalance =
+              dbBalance + (orderSubmitDTO.getNoOfShares() * stockQuote.getDayLow().doubleValue());
         }
       }
 
@@ -133,7 +133,8 @@ public class OrderServiceImpl implements OrderService {
       if (orderPrice.compareTo(stockQuote.getDayHigh()) > 0) {
         if (type == ORDER_TYPE.BUY) {
           orderSubmitDTO.setCost(stockQuote.getDayHigh().doubleValue());
-          dbBalance = dbBalance - (orderSubmitDTO.getNoOfShares() * stockQuote.getDayHigh().doubleValue());
+          dbBalance =
+              dbBalance - (orderSubmitDTO.getNoOfShares() * stockQuote.getDayHigh().doubleValue());
         } else if (type == ORDER_TYPE.SELL) {
           throw new OrderNotFilledException(
               "Order not filled as price is more than highest ask price on " + LocalDateTime.now());
@@ -150,7 +151,8 @@ public class OrderServiceImpl implements OrderService {
         }
       }
 
-      Order order = new Order((long) userId, orderSubmitDTO.getStockTicker(), orderSubmitDTO.getOrderType(), orderSubmitDTO.getNoOfShares(), orderSubmitDTO.getCost());
+      Order order = new Order((long) userId, orderSubmitDTO.getStockTicker(),
+          orderSubmitDTO.getOrderType(), orderSubmitDTO.getNoOfShares(), orderSubmitDTO.getCost());
       order = orderRepository.save(order);
       User updatedUser = dbUser.get();
       updatedUser.setBalance(dbBalance);

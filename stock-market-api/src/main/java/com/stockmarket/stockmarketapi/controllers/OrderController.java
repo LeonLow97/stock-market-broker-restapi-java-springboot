@@ -32,37 +32,44 @@ public class OrderController {
   OrderService orderService;
 
   @Operation(summary = "Get All Orders", description = "Retrieves all the orders of the user.")
-  @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved all the orders of the user.", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Order.class))))
-  })
+  @ApiResponses(value = {@ApiResponse(responseCode = "200",
+      description = "Successfully retrieved all the orders of the user.",
+      content = @Content(array = @ArraySchema(schema = @Schema(implementation = Order.class))))})
   @GetMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<Order>> getAllOrders(HttpServletRequest request) {
     Integer userId = (Integer) request.getAttribute("userId");
     return new ResponseEntity<>(orderService.getAllOrders(userId), HttpStatus.OK);
   }
 
-  @Operation(summary = "Get Order", description = "Retrieves a specific order of the user based on order id.")
-  @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved the specified order of the user.", content = @Content(schema = @Schema(implementation = Order.class)))
-  })
+  @Operation(summary = "Get Order",
+      description = "Retrieves a specific order of the user based on order id.")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200",
+      description = "Successfully retrieved the specified order of the user.",
+      content = @Content(schema = @Schema(implementation = Order.class)))})
   @GetMapping(value = "/orders/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Order> getOrder(HttpServletRequest request, @PathVariable("orderId") Integer orderId) {
+  public ResponseEntity<Order> getOrder(HttpServletRequest request,
+      @PathVariable("orderId") Integer orderId) {
     Integer userId = (Integer) request.getAttribute("userId");
     return new ResponseEntity<>(orderService.getOrder(userId, orderId), HttpStatus.OK);
   }
 
   @Operation(summary = "Submit Order", description = "Submits a order to BUY or SELL a stock.")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "201", description = "Successfully created an order when the stock is bought or sold.", content = @Content(schema = @Schema(implementation = OrderSubmitDTO.class))),
-    @ApiResponse(responseCode = "400", description = "BAD REQUEST", content = @Content),
-    @ApiResponse(responseCode = "404", description = "NOT FOUND - Order Not Found", content = @Content),
-    @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR - Unable to connect to Yahoo Finance API.", content = @Content)
-  })
+      @ApiResponse(responseCode = "201",
+          description = "Successfully created an order when the stock is bought or sold.",
+          content = @Content(schema = @Schema(implementation = OrderSubmitDTO.class))),
+      @ApiResponse(responseCode = "400", description = "BAD REQUEST", content = @Content),
+      @ApiResponse(responseCode = "404", description = "NOT FOUND - Order Not Found",
+          content = @Content),
+      @ApiResponse(responseCode = "500",
+          description = "INTERNAL SERVER ERROR - Unable to connect to Yahoo Finance API.",
+          content = @Content)})
   @PostMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Order> submitOrder(HttpServletRequest request, @RequestBody OrderSubmitDTO orderSubmitDTO) {
+  public ResponseEntity<Order> submitOrder(HttpServletRequest request,
+      @RequestBody OrderSubmitDTO orderSubmitDTO) {
     Integer userId = (Integer) request.getAttribute("userId");
     Order order = orderService.submitOrder(userId, orderSubmitDTO);
     return new ResponseEntity<>(order, HttpStatus.CREATED);
   }
-  
+
 }
