@@ -112,6 +112,8 @@ public class UserServiceImpl implements UserService {
     updatedUser.setBalance(updatedBalance);
     userRepository.save(updatedUser);
 
+    userAmountDTO.setBalance(updatedBalance);
+
     return userAmountDTO;
   }
 

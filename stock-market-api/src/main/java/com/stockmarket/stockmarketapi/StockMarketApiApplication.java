@@ -25,7 +25,6 @@ public class StockMarketApiApplication {
 		AuthFilter authFilter = new AuthFilter();
 		registrationBean.setFilter(authFilter);
 		registrationBean.addUrlPatterns("/api/*");
-		// registrationBean.addUrlPatterns("/yahoo-api/*");
 		return registrationBean;
 	}
 
