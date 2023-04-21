@@ -8,22 +8,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import com.stockmarket.stockmarketapi.controllers.PortfolioController;
 import com.stockmarket.stockmarketapi.entity.Portfolio;
 import com.stockmarket.stockmarketapi.service.PortfolioService;
-import org.json.JSONObject;
-import org.json.JSONArray;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 import javax.servlet.http.HttpServletRequest;
 
 @WebMvcTest(PortfolioController.class)
@@ -33,7 +29,7 @@ public class PortfolioControllerTests {
     private static final String GET_PORTFOLIO_PATH = "/api/portfolio";
     private static final String GET_PORTFOLIO_STOCK = "/api/portfolio/{portfolioId}";
 
-    private List<Portfolio> testPortfolio;
+    private List<Portfolio> portfolioList;
     private Portfolio portfolio;
 
     @Autowired
@@ -47,44 +43,53 @@ public class PortfolioControllerTests {
         assertNotNull(mockMvc);
         assertNotNull(portfolioService);
 
-        testPortfolio = Arrays.asList(
-                new Portfolio(Long.valueOf(1), "Tesla, Inc.", "TSLA", 600, 128.33, 208.15, 80.0, 0.0),
-                new Portfolio(Long.valueOf(1), "Alibaba Group Holding Limited", "BABA", 210, 98.12, 138.17, 70.0, 0.0),
-                new Portfolio(Long.valueOf(1), "Apple Inc.", "AAPL", 45, 134.50, 162.89, 65.0, 0.0));
+        portfolioList = Arrays.asList(
+                new Portfolio(Long.valueOf(1), "Tesla, Inc.", "TSLA", 600, 128.33, 208.15, 80.0,
+                        0.0),
+                new Portfolio(Long.valueOf(1), "Alibaba Group Holding Limited", "BABA", 210, 98.12,
+                        138.17, 70.0, 0.0),
+                new Portfolio(Long.valueOf(1), "Apple Inc.", "AAPL", 45, 134.50, 162.89, 65.0,
+                        0.0));
 
-        portfolio = new Portfolio(Long.valueOf(1), "Apple Inc.", "AAPL", 45, 134.50, 162.89, 65.0, 0.0);
+        portfolio =
+                new Portfolio(Long.valueOf(1), "Apple Inc.", "AAPL", 45, 134.50, 162.89, 65.0, 0.0);
     }
 
     @Test
     public void Test_GetPortfolioShouldReturn200OK() throws Exception {
         // Arrange
-        when(portfolioService.getPortfolio(1)).thenReturn(testPortfolio);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        when(portfolioService.getPortfolio(1)).thenReturn(portfolioList);
         when(request.getAttribute("userId")).thenReturn(1);
 
-        // Act
-        MvcResult mvcResult = mockMvc.perform(
-            get(GET_PORTFOLIO_PATH).accept(MediaType.APPLICATION_JSON).with(requestBuilder -> {
-                requestBuilder.setAttribute("userId", 1);
-                return requestBuilder;
-            })).andExpect(status().isOk()).andReturn();
+        // Act and Assert
+        mockMvc.perform(
+                get(GET_PORTFOLIO_PATH).accept(MediaType.APPLICATION_JSON).with(requestBuilder -> {
+                    requestBuilder.setAttribute("userId", 1);
+                    return requestBuilder;
+                })).andExpect(jsonPath("$[0].stockName").value("Tesla, Inc."))
+                .andExpect(jsonPath("$[0].stockTicker").value("TSLA"))
+                .andExpect(jsonPath("$[0].noOfShares").value(600))
+                .andExpect(jsonPath("$[0].cost").value(128.33))
+                .andExpect(jsonPath("$[0].price").value(208.15))
+                .andExpect(jsonPath("$[0].pnlinPercentage").value(80.0))
+                .andExpect(jsonPath("$[0].pnlinDollars").value(0.0)).andExpect(status().isOk())
+                .andExpect(jsonPath("$[1].stockName").value("Alibaba Group Holding Limited"))
+                .andExpect(jsonPath("$[1].stockTicker").value("BABA"))
+                .andExpect(jsonPath("$[1].noOfShares").value(210))
+                .andExpect(jsonPath("$[1].cost").value(98.12))
+                .andExpect(jsonPath("$[1].price").value(138.17))
+                .andExpect(jsonPath("$[1].pnlinPercentage").value(70.0))
+                .andExpect(jsonPath("$[1].pnlinDollars").value(0.0))
+                .andExpect(jsonPath("$[2].stockName").value("Apple Inc."))
+                .andExpect(jsonPath("$[2].stockTicker").value("AAPL"))
+                .andExpect(jsonPath("$[2].noOfShares").value(45))
+                .andExpect(jsonPath("$[2].cost").value(134.50))
+                .andExpect(jsonPath("$[2].price").value(162.89))
+                .andExpect(jsonPath("$[2].pnlinPercentage").value(65.0))
+                .andExpect(jsonPath("$[2].pnlinDollars").value(0.0)).andReturn();
 
-        // Assert
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals(200, status);
-
-        String responseBody = mvcResult.getResponse().getContentAsString();
-        JSONArray jsonArray = new JSONArray(responseBody);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            assertEquals(testPortfolio.get(i).getStockName(), jsonObject.getString("stockName"));
-            assertEquals(testPortfolio.get(i).getStockTicker(), jsonObject.getString("stockTicker"));
-            assertEquals(testPortfolio.get(i).getNoOfShares(), Integer.parseInt(jsonObject.getString("noOfShares")));
-            assertEquals(testPortfolio.get(i).getCost(), Double.parseDouble(jsonObject.getString("cost")));
-            assertEquals(testPortfolio.get(i).getPrice(), Double.parseDouble(jsonObject.getString("price")));
-            assertEquals(testPortfolio.get(i).getPNLInPercentage(), Double.parseDouble(jsonObject.getString("pnlinPercentage")));
-            assertEquals(testPortfolio.get(i).getPNLInDollars(), Double.parseDouble(jsonObject.getString("pnlinDollars")));
-        }
+        verify(portfolioService, times(1)).getPortfolio(1);
     }
 
     @Test
@@ -94,36 +99,21 @@ public class PortfolioControllerTests {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
 
-        // Act
-        MvcResult mvcResult = mockMvc.perform(
+        // Act and Assert
+        mockMvc.perform(
                 get(GET_PORTFOLIO_STOCK, 1).accept(MediaType.APPLICATION_JSON).with(requestBuilder -> {
                     requestBuilder.setAttribute("userId", 1);
-                    return requestBuilder;
-                })).andExpect(status().isOk()).andReturn();
+                return requestBuilder;
+                })).andExpect(jsonPath("$.stockName").value("Apple Inc."))
+                .andExpect(jsonPath("$.stockTicker").value("AAPL"))
+                .andExpect(jsonPath("$.noOfShares").value(45))
+                .andExpect(jsonPath("$.cost").value(134.50))
+                .andExpect(jsonPath("$.price").value(162.89))
+                .andExpect(jsonPath("$.pnlinPercentage").value(65.0))
+                .andExpect(jsonPath("$.pnlinDollars").value(0.0))
+                .andExpect(status().isOk()).andReturn();
 
-        // Assert
-        // Extract value from path parameter (regex to capture one or more digits 0-9)
-        Pattern pattern = Pattern.compile("/api/portfolio/(\\d+)");
-        Matcher matcher = pattern.matcher(mvcResult.getRequest().getRequestURI());
-        matcher.find();
-        int portfolioId = Integer.parseInt(matcher.group(1));
-
-        // Calling the orderService method with the extracted path parameter portfolioId
-        Portfolio returnedPortfolio = portfolioService.getPortfolioStock(1, portfolioId);
-        assertEquals(portfolio, returnedPortfolio);
-
-        int status = mvcResult.getResponse().getStatus();
-        assertEquals(200, status);
-
-        String responseBody = mvcResult.getResponse().getContentAsString();
-        JSONObject jsonObject = new JSONObject(responseBody);
-        assertEquals(portfolio.getStockName(), jsonObject.getString("stockName"));
-        assertEquals(portfolio.getStockTicker(), jsonObject.getString("stockTicker"));
-        assertEquals(portfolio.getNoOfShares(), Integer.parseInt(jsonObject.getString("noOfShares")));
-        assertEquals(portfolio.getCost(), Double.parseDouble(jsonObject.getString("cost")));
-        assertEquals(portfolio.getPrice(), Double.parseDouble(jsonObject.getString("price")));
-        assertEquals(portfolio.getPNLInPercentage(), Double.parseDouble(jsonObject.getString("pnlinPercentage")));
-        assertEquals(portfolio.getPNLInDollars(), Double.parseDouble(jsonObject.getString("pnlinDollars")));
+        verify(portfolioService, times(1)).getPortfolioStock(1, 1);
     }
 
 }
