@@ -120,7 +120,7 @@ public class OrderControllerTests {
         when(orderService.submitOrder(eq(1), ArgumentMatchers.any(OrderSubmitDTO.class)))
                 .thenReturn(order); // use ArgumentMatchers
 
-        // Act
+        // Act and Assert
         mockMvc.perform(
                 post(SUBMIT_ORDER_PATH).content(objectMapper.writeValueAsString(orderSubmitDTO))
                         .contentType(MediaType.APPLICATION_JSON).with(requestBuilder -> {
@@ -132,5 +132,7 @@ public class OrderControllerTests {
                 .andExpect(jsonPath("$.noOfShares").value(260))
                 .andExpect(jsonPath("$.cost").value(100.1)).andExpect(status().isCreated())
                 .andReturn();
+
+        verify(orderService, times(1)).submitOrder(eq(1), ArgumentMatchers.any(OrderSubmitDTO.class));
     }
 }

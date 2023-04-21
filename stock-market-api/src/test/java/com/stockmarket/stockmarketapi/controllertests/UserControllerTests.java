@@ -2,14 +2,13 @@ package com.stockmarket.stockmarketapi.controllertests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
+import org.mockito.ArgumentMatchers;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import java.util.Map;
@@ -24,7 +23,6 @@ import com.stockmarket.stockmarketapi.entity.User;
 import com.stockmarket.stockmarketapi.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,7 +36,8 @@ public class UserControllerTests {
     private static final String DEPOSIT_PATH = "/api/deposit";
     private static final String WITHDRAW_PATH = "/api/withdraw";
 
-    private User testUser;
+    private User user = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0, 1);
+    private UserAmountDTO userAmountDTO = new UserAmountDTO();
 
     @Autowired
     private MockMvc mockMvc;
@@ -54,10 +53,6 @@ public class UserControllerTests {
         assertNotNull(mockMvc);
         assertNotNull(objectMapper);
         assertNotNull(userService);
-
-        testUser = new User("leonlow", "Password0!", "leonlow@email.com", 1000.0, 1);
-        testUser.setUserId(1L);
-        testUser.setIsActive(1);
     }
 
     @Test
@@ -66,99 +61,84 @@ public class UserControllerTests {
         UserRegisterDTO userRegisterDTO =
                 new UserRegisterDTO("leonlow", "leonlow@email.com", "Password0!");
         when(userService.registerUser(any(UserRegisterDTO.class))).thenReturn(userRegisterDTO);
-        String requestBody = objectMapper.writeValueAsString(testUser);
 
-        // Act
-        MvcResult mvcResult = mockMvc.perform(
-                post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        // Act and Assert
+        mockMvc.perform(
+                post(REGISTER_PATH).content(objectMapper.writeValueAsString(userRegisterDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.username").value("leonlow"))
+                .andExpect(jsonPath("$.email").value("leonlow@email.com"))
                 .andExpect(status().isCreated()).andReturn();
 
-        // Assert
-        int status = mvcResult.getResponse().getStatus();
-        String content = mvcResult.getResponse().getContentAsString();
-        String expectedJson = "{\"username\":\"leonlow\",\"email\":\"leonlow@email.com\"}";
-        assertEquals(201, status);
-        assertEquals(expectedJson, content);
+        verify(userService, times(1)).registerUser(any(UserRegisterDTO.class));
     }
 
     @Test
     public void Test_LoginShouldReturn200OK() throws Exception {
         // Arrange
-        when(userService.validateUser(any(UserLoginDTO.class))).thenReturn(testUser);
-        String requestBody = objectMapper.writeValueAsString(testUser);
+        UserLoginDTO userLoginDTO = new UserLoginDTO("leonlow@email.com", "Password0!");
+        when(userService.validateUser(any(UserLoginDTO.class))).thenReturn(user);
 
-        // Act
-        MvcResult mvcResult = mockMvc.perform(post(LOGIN_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-                .andExpect(status().isOk())
+        // Act and Assert
+        mockMvc.perform(post(LOGIN_PATH).content(objectMapper.writeValueAsString(userLoginDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.accessToken").exists()).andExpect(status().isOk())
                 .andReturn();
 
-        // Assert
-        int status = mvcResult.getResponse().getStatus();
-        String content = mvcResult.getResponse().getContentAsString();
-        assertEquals(200, status);
-        // Assert that the response contains a JWT token
-        assertTrue(content.contains("accessToken"));
+        verify(userService, times(1)).validateUser(any(UserLoginDTO.class));
     }
 
     @Test
     public void Test_DepositUserBalance() throws Exception {
         // Arrange
-        UserAmountDTO userAmountDTO = new UserAmountDTO();
+        userAmountDTO.setAmount(1000.0);
+        userAmountDTO.setBalance(3000.0);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
-        when(userService.updateUserBalance(1, userAmountDTO)).thenReturn(userAmountDTO);
-        String requestBody = objectMapper.writeValueAsString(userAmountDTO);
+        when(userService.updateUserBalance(eq(1), ArgumentMatchers.any(UserAmountDTO.class)))
+                .thenReturn(userAmountDTO);
 
-        // Act
-        MvcResult mvcResult =
-                mockMvc.perform(put(DEPOSIT_PATH).contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody).with(requestBuilder -> {
-                            requestBuilder.setAttribute("userId", 1);
-                            return requestBuilder;
-                        })).andExpect(status().isOk()).andReturn();
+        // Act and Assert
+        mockMvc.perform(put(DEPOSIT_PATH).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userAmountDTO)).with(requestBuilder -> {
+                    requestBuilder.setAttribute("userId", 1);
+                    return requestBuilder;
+                })).andExpect(jsonPath("$.balance").value(3000.0)).andExpect(status().isOk())
+                .andReturn();
 
-        // Assert
-        int status = mvcResult.getResponse().getStatus();
-        String content = mvcResult.getResponse().getContentAsString();
-        String expectedJson = String.format("{\"balance\":%.1f}", 3000.0);
-        assertEquals(HttpStatus.OK.value(), status);
-        assertEquals(expectedJson, content);
+        verify(userService, times(1)).updateUserBalance(eq(1),
+                ArgumentMatchers.any(UserAmountDTO.class));
     }
-
-
 
     @Test
     public void Test_WithdrawUserBalance() throws Exception {
         // Arrange
+        userAmountDTO.setAmount(500.0);
+        userAmountDTO.setBalance(500.0);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("userId")).thenReturn(1);
-        String requestBody = objectMapper.writeValueAsString(testUser);
+        when(userService.updateUserBalance(eq(1), ArgumentMatchers.any(UserAmountDTO.class)))
+                .thenReturn(userAmountDTO);
 
-        // Act
-        MvcResult mvcResult =
-                mockMvc.perform(put(WITHDRAW_PATH).contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody).with(requestBuilder -> {
-                            requestBuilder.setAttribute("userId", 1);
-                            return requestBuilder;
-                        })).andExpect(status().isOk()).andReturn();
+        // Act and Assert
+        mockMvc.perform(put(WITHDRAW_PATH).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userAmountDTO)).with(requestBuilder -> {
+                    requestBuilder.setAttribute("userId", 1);
+                    return requestBuilder;
+                })).andExpect(jsonPath("$.balance").value(500.0)).andExpect(status().isOk())
+                .andReturn();
 
-        // Assert
-        int status = mvcResult.getResponse().getStatus();
-        String content = mvcResult.getResponse().getContentAsString();
-        String expectedJson = "{\"success\":true}";
-        assertEquals(200, status);
-        assertEquals(expectedJson, content);
+        verify(userService, times(1)).updateUserBalance(eq(1),
+                ArgumentMatchers.any(UserAmountDTO.class));
     }
 
     @Test
     public void Test_GenerateJWTToken() {
         // Arrange
-        testUser.setUserId(123L);
+        user.setUserId(123L);
 
         // Act
-        Map<String, String> tokenMap = UserController.generateJWTToken(testUser);
+        Map<String, String> tokenMap = UserController.generateJWTToken(user);
 
         // Assert
         assertTrue(tokenMap.containsKey("accessToken"));
