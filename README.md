@@ -73,9 +73,8 @@ A Stock Market Broker REST API is a web-based project that provides a set of end
 - Check if it is possible to buy a stock with an invalid ticker.
 - For Deposit and Withdrawal, ensure that amount cannot be negative.
 - Trim White Spaces
-- Data Validation for all the fields
-  - Accept INT, STRING, DOUBLE
-  - Field length
+- JSON payload can only include fields allowed in the request.
+- Testing on service layer not completed.
 - Fix added date and updated date to align with the action method because now it is hardcoded to be `LocalDateTime.now()`.
 - Docker Compose
-- Complete Swagger UI RestAPI Documentation
+- Set session for JWT Token.
